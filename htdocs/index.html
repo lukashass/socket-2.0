@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>JSSocket</title>
+
+	<link href="img/fav.png" rel="shortcut icon">
+
+	<link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
+	<link href="https://unpkg.com/vuetify/dist/vuetify.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="//cdn.materialdesignicons.com/2.1.19/css/materialdesignicons.min.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+	<link rel="manifest" href="manifest.json">
+</head>
+<body>
+	<div id="app">
+
+		<v-app>
+			<v-navigation-drawer v-model="drawer" fixed app clipped>
+				<v-list dense>
+					<v-list-tile @click="">
+					  <v-list-tile-action>
+					    <v-icon>home</v-icon>
+					  </v-list-tile-action>
+					  <v-list-tile-content>
+					    <v-list-tile-title>Home</v-list-tile-title>
+					  </v-list-tile-content>
+					</v-list-tile>
+					<v-list-tile @click="">
+					  <v-list-tile-action>
+					    <v-icon>contact_mail</v-icon>
+					  </v-list-tile-action>
+					  <v-list-tile-content>
+					    <v-list-tile-title>Contact</v-list-tile-title>
+					  </v-list-tile-content>
+					</v-list-tile>
+				</v-list>
+			</v-navigation-drawer>
+			<v-toolbar clipped-left dark fixed app color="blue-grey darken-2">
+				<v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
+				<v-toolbar-title class="white--text">JSSocket</v-toolbar-title>
+				<v-spacer></v-spacer>
+				<v-btn icon>
+				  	<v-icon>more_vert</v-icon>
+				</v-btn>
+			</v-toolbar>
+			<v-content>
+				<v-container
+			      fluid
+			      style="min-height: 0;"
+			      grid-list-lg
+			    >
+			      <v-layout row wrap>
+					<v-flex v-for="socket in sockets" :key="socket.id" xs12 md4>
+			          <v-card v-bind:class="socket.status == 1 ? 'cyan' : 'blue-grey'" color="darken-2" class="white--text">
+			            <v-container fluid grid-list-lg>
+			              <v-layout row>
+			                <v-flex xs10>
+			                  <div>
+			                    <div class="headline">{{ socket.name }}</div>
+			                    <div>{{ socket.description }}</div>
+			                  </div>
+			                </v-flex>
+			                <v-flex xs2>
+
+					            <v-btn flat icon dark @click="power(socket.id, 1)">
+					             	 <v-icon>mdi-power-plug</v-icon>
+					            </v-btn>
+					            <v-btn flat icon dark @click="power(socket.id, 0)">
+					             	 <v-icon>mdi-power-plug-off</v-icon>
+					            </v-btn>
+							    
+			                </v-flex>
+			              </v-layout>
+			            </v-container>
+			             <v-card-actions>
+			            	<v-btn flat dark>edit</v-btn>
+			            </v-card-actions>
+			          </v-card>
+			        </v-flex>
+			      </v-layout>
+			    </v-container>
+			</v-content>
+			<v-footer app></v-footer>
+		</v-app>
+
+	</div>
+	  <!--<main>
+	    <v-container>
+	    	{{ message }}
+			<div v-if="trello > 0">
+				<p>Ich fahre gerne {{ trello }} zuege</p>
+			</div>
+			<div>
+				<input v-model="trello">
+				<button v-on:click="foo(field)">Klick mich!</button>
+			</div>
+			<div v-for="socket in sockets">
+				<p>{{ socket.name }} - {{ socket.status }}</p>
+			</div>
+	    </v-container>
+	  </main>-->
+
+
+	<script src="https://unpkg.com/vue/dist/vue.js"></script>
+	<script src="https://unpkg.com/vuetify/dist/vuetify.js"></script>
+	<script type="text/javascript" src="app.js"></script>
+</body>
+</html>
