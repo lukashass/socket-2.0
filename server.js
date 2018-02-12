@@ -2,19 +2,18 @@ const WebSocket = require('ws');
 const mysql = require('mysql');
 const cmd = require('node-cmd');
 const CONFIG = require('./config.json');
+const mysqlCon = {
+        host     : CONFIG.dbHost,
+        user     : CONFIG.dbUser,
+        password : CONFIG.dbPassword,
+        database : CONFIG.dbName
+}
 
-const db = mysql.createConnection({
-	host     : CONFIG.dbHost,
-	user     : CONFIG.dbUser,
-	password : CONFIG.dbPassword,
-	database : CONFIG.dbName
-});
+var db = mysql.createConnection(mysqlCon);
 
 const wss = new WebSocket.Server({ port: CONFIG.wsPort });
 
 var data;
-
-db.connect();
 
 db.query('SELECT * FROM sockets', function (error, results, fields) {
 	if (error) throw error;
@@ -77,4 +76,11 @@ wss.on('connection', function connection(ws) {
 	ws.send(JSON.stringify(data));
 
   //ws.send('something from server');
+});
+
+db.on('error', function(err) {
+	if(err.code == 'PROTOCOL_CONNECTION_LOST') {
+		db = mysql.createConnection(mysqlCon);
+	}
+	console.log(err.code); // 'ER_BAD_DB_ERROR'
 });
