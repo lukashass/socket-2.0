@@ -13,12 +13,12 @@ var db = mysql.createConnection(mysqlCon);
 
 const wss = new WebSocket.Server({ port: CONFIG.wsPort });
 
-var data;
+var sockets;
 
 db.query('SELECT * FROM sockets', function (error, results, fields) {
 	if (error) throw error;
 
-	data = results;
+	sockets = results;
 
 
 	/*data[0].name = 'not tv';
@@ -68,7 +68,7 @@ function initConnection(ws) {
 	// initial data for client
 	sendConnection(ws, {
 		'type': 'sockets',
-		'sockets': data
+		'sockets': sockets
 	})
 }
 
@@ -76,7 +76,7 @@ function incoming(ws, message) {
 	console.log('received: %s', message)
 
 	// temp var to find changes
-	var old = data
+	var data
 
 	try {
 		// hopefully message is always as expected :p
@@ -85,7 +85,22 @@ function incoming(ws, message) {
 		console.log(e)
 	}
 
+	switch (data.type) {
+		case 'sockets':
+			updateSockets(data.sockets)
+			break
 
+}
+
+function sendConnection (client, data) {
+	if (client.readyState === client.OPEN) {
+		client.send(JSON.stringify(data))
+	}
+}
+
+function updateSockets(data){
+	var old = sockets
+	sockets = data
 	if(data.length == old.length) { // test not really good enough
 		data.forEach( function(item, i) {
 			// data[i] === item
@@ -108,14 +123,8 @@ function incoming(ws, message) {
 		if(client !== ws){
 			sendConnection(client, {
 				'type': 'sockets',
-				'sockets': data
+				'sockets': sockets
 			})
 		}
 	})
-}
-
-function sendConnection (client, data) {
-	if (client.readyState === client.OPEN) {
-		client.send(JSON.stringify(data))
-	}
 }

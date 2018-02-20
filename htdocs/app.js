@@ -51,6 +51,7 @@ function incoming(input) {
 	switch(data.type) {
 		case 'sockets':
 			vm.sockets = data.sockets
+			break
 	}
 	console.log(vm.sockets)
 }
