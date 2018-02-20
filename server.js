@@ -39,7 +39,20 @@ wss.on('connection', function connection(ws) {
 		incoming(ws, msg)
 	})
 
+	ws.on('pong', () => {
+      		ws.isAlive = true
+    	})
 });
+
+// WebSocket keep a live pings
+setInterval(() => {
+	wss.clients.forEach(function each (ws) {
+		if (ws.isAlive === false) return ws.terminate()
+
+		ws.isAlive = false
+		ws.ping(() => {})
+	})
+}, 30000)
 
 db.on('error', function(err) {
 	if(err.code == 'PROTOCOL_CONNECTION_LOST') {
@@ -50,8 +63,13 @@ db.on('error', function(err) {
 
 
 function initConnection(ws) {
+	ws.isAlive = true
+
 	// initial data for client
-	ws.send(JSON.stringify(data));
+	sendConnection(ws, {
+		'type': 'sockets',
+		'sockets': data
+	})
 }
 
 function incoming(ws, message) {
@@ -88,7 +106,16 @@ function incoming(ws, message) {
 
 	wss.clients.forEach( function(client) {
 		if(client !== ws){
-			client.send(JSON.stringify(data))
+			sendConnection(client, {
+				'type': 'sockets',
+				'sockets': data
+			})
 		}
 	})
+}
+
+function sendConnection (client, data) {
+	if (client.readyState === client.OPEN) {
+		client.send(JSON.stringify(data))
+	}
 }
