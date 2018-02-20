@@ -20,13 +20,6 @@ db.query('SELECT * FROM sockets', function (error, results, fields) {
 
 	sockets = results;
 
-
-	/*data[0].name = 'not tv';
-	console.log(fields);*/
-	//console.log(data);
-
-
-
 });
 
 wss.on('connection', function connection(ws) {
@@ -44,7 +37,7 @@ wss.on('connection', function connection(ws) {
     	})
 });
 
-// WebSocket keep a live pings
+// WebSocket keep alive pings
 setInterval(() => {
 	wss.clients.forEach(function each (ws) {
 		if (ws.isAlive === false) return ws.terminate()
@@ -87,21 +80,22 @@ function incoming(ws, message) {
 
 	switch (data.type) {
 		case 'sockets':
-			updateSockets(data.sockets)
+			updateSockets(ws, data.sockets)
 			break
-
-}
-
-function sendConnection (client, data) {
-	if (client.readyState === client.OPEN) {
-		client.send(JSON.stringify(data))
 	}
 }
 
-function updateSockets(data){
+function sendConnection (ws, data) {
+	if (ws.readyState === ws.OPEN) {
+		ws.send(JSON.stringify(data))
+	}
+}
+
+function updateSockets(ws, data){
 	var old = sockets
 	sockets = data
 	if(data.length == old.length) { // test not really good enough
+
 		data.forEach( function(item, i) {
 			// data[i] === item
 			if(data[i] != old[i]) {

@@ -13,7 +13,8 @@ var vm = new Vue({
 					socket.status = action
 				}
 			})
-			ws.send(JSON.stringify(this.sockets))
+			var raw = {'type': 'sockets', 'sockets': this.sockets}
+			ws.send(JSON.stringify(raw))
 		}
 	}
 })
