@@ -31,51 +31,14 @@ db.query('SELECT * FROM sockets', function (error, results, fields) {
 
 wss.on('connection', function connection(ws) {
 
-	ws.on('error', () => console.log('errored'));
+	ws.on('error', () => console.log('errored'))
 
-	ws.on('message', function incoming(message) {
-		console.log('received: %s', message);
+	initConnection(ws)
 
-		// temp var to find changes
-		var old = data;
+	ws.on('message', (msg) => {
+		incoming(ws, msg)
+	})
 
-		try {
-			// hopefully message is always as expected :p
-			data = JSON.parse(message);
-		} catch(e) {
-			console.log(e);
-		}
-
-
-		if(data.length == old.length) { // test not really good enough
-			data.forEach( function(item, i) {
-				// data[i] === item
-				if(data[i] != old[i]) {
-
-					db.query('UPDATE sockets SET status = ? WHERE id = ?', [item.status, item.id], function (error, results, fields) {
-						if (error) throw error;
-					});
-
-					if(data[i].status != old[i].status) {
-						cmd.run("sudo ./codesendRoot " + (item.status == 1 ? parseInt(item.code_on, 10) : parseInt(item.code_off, 10)) + " " + parseInt(item.protocol, 10));
-					}
-				}
-			});
-		}
-
-		// process new data
-
-		wss.clients.forEach( function(client) {
-			if(client !== ws){
-				client.send(JSON.stringify(data));
-			}
-		});
-	});
-
-	// initial data for client
-	ws.send(JSON.stringify(data));
-
-  //ws.send('something from server');
 });
 
 db.on('error', function(err) {
@@ -84,3 +47,48 @@ db.on('error', function(err) {
 	}
 	console.log(err.code); // 'ER_BAD_DB_ERROR'
 });
+
+
+function initConnection(ws) {
+	// initial data for client
+	ws.send(JSON.stringify(data));
+}
+
+function incoming(ws, message) {
+	console.log('received: %s', message)
+
+	// temp var to find changes
+	var old = data
+
+	try {
+		// hopefully message is always as expected :p
+		data = JSON.parse(message)
+	} catch(e) {
+		console.log(e)
+	}
+
+
+	if(data.length == old.length) { // test not really good enough
+		data.forEach( function(item, i) {
+			// data[i] === item
+			if(data[i] != old[i]) {
+
+				db.query('UPDATE sockets SET status = ? WHERE id = ?', [item.status, item.id], function (error, results, fields) {
+					if (error) throw error
+				})
+
+				if(data[i].status != old[i].status) {
+					cmd.run("sudo ./codesendRoot " + (item.status == 1 ? parseInt(item.code_on, 10) : parseInt(item.code_off, 10)) + " " + parseInt(item.protocol, 10))
+				}
+			}
+		})
+	}
+
+	// process new data
+
+	wss.clients.forEach( function(client) {
+		if(client !== ws){
+			client.send(JSON.stringify(data))
+		}
+	})
+}
