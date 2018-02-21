@@ -20,26 +20,34 @@ var vm = new Vue({
 })
 
 // Create WebSocket connection.
-const ws = new WebSocket('wss://' + window.location.hostname + '/websocket/')
+var ws = connectWebsocket('wss://' + window.location.hostname + '/websocket/')
 
-// Connection opened
-ws.onopen = function (event) {
-	console.log('WebSocket: connected')
-	vm.connected = true
-	vm.auth = false
-}
+function connectWebsocket(url) {
 
-// Listen for messages
-ws.onmessage = function (event) {
-	incoming(event.data)
-}
+    var ws = new WebSocket(url)
 
-ws.onclose = function (e) {
-	console.log('WebSocket: disconnected')
-	vm.connected = false
-	/*setTimeout(() => {
-		socket = connectWebsocket(url)
-	}, 1000)*/
+    // Connection opened
+    ws.onopen = function (event) {
+    	console.log('WebSocket: connected')
+    	vm.connected = true
+    	vm.auth = false
+    }
+
+    // Listen for messages
+    ws.onmessage = function (event) {
+    	incoming(event.data)
+    }
+
+    ws.onerror = (e) => {
+    }
+
+    ws.onclose = function (e) {
+    	console.log('WebSocket: disconnected')
+    	vm.connected = false
+    	setTimeout(() => {
+    		ws = connectWebsocket(url)
+    	}, 1000)
+    }
 }
 
 function incoming(input) {
