@@ -24,30 +24,32 @@ var ws = connectWebsocket('wss://' + window.location.hostname + '/websocket/')
 
 function connectWebsocket(url) {
 
-    var ws = new WebSocket(url)
+    var result = new WebSocket(url)
 
     // Connection opened
-    ws.onopen = function (event) {
+    result.onopen = function (event) {
     	console.log('WebSocket: connected')
     	vm.connected = true
     	vm.auth = false
     }
 
     // Listen for messages
-    ws.onmessage = function (event) {
+    result.onmessage = function (event) {
     	incoming(event.data)
     }
 
-    ws.onerror = (e) => {
+    result.onerror = (e) => {
     }
 
-    ws.onclose = function (e) {
+    result.onclose = function (e) {
     	console.log('WebSocket: disconnected')
     	vm.connected = false
     	setTimeout(() => {
     		ws = connectWebsocket(url)
     	}, 1000)
     }
+
+    return result
 }
 
 function incoming(input) {

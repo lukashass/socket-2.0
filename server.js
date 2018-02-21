@@ -77,7 +77,7 @@ function initConnection(ws) {
 }
 
 function incoming(ws, message) {
-	console.log('received: %s', message)
+	console.log('received')
 
 	// temp var to find changes
 	var data
@@ -110,7 +110,8 @@ function updateSockets(data){
 
 		sockets.forEach( function(item, i) {
 			// sockets[i] === item
-			if(sockets[i] != old[i]) {
+			//if(sockets[i] != old[i]) {
+            if(item.status != old[i].status) { // okay for now, only changing status anyway
 
 				db.query('UPDATE sockets SET status = ? WHERE id = ?', [item.status, item.id], function (error, results, fields) {
 					if (error) throw error
@@ -149,11 +150,15 @@ function broadcastAll() {
 function initJobs() {
     timers.forEach( function(timer) {
         jobs[timer.id] = schedule.scheduleJob(timer.minute + ' ' + timer.hour + ' * * *', function(){
-            var data = sockets
-            data[timer.socket_id].status = timer.action
-            updateSockets(data)
-            broadcastAll()
-            console.log(timer.socket_id + ' ' + timer.action);
+            if(sockets[timer.socket_id].status != timer.action) {
+
+                var data = JSON.parse(JSON.stringify(sockets)) // deep copy of sockets
+                data[timer.socket_id].status = timer.action
+
+                updateSockets(data)
+                broadcastAll()
+
+            }
         })
     })
 }
