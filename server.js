@@ -14,14 +14,15 @@ var db = mysql.createConnection(mysqlCon)
 
 const wss = new WebSocket.Server({ port: CONFIG.wsPort })
 
-var sockets
+var sockets = []
 var timers
 var jobs = []
 
 db.query('SELECT * FROM sockets', function (error, results, fields) {
 	if (error) throw error
-
-	sockets = results
+    results.forEach( function(result) {
+        sockets[result.id] = result
+    })
 
 });
 
@@ -74,6 +75,11 @@ function initConnection(ws) {
 		'type': 'sockets',
 		'sockets': sockets
 	})
+
+    sendConnection(ws, {
+        'type': 'timers',
+        'timers': timers
+    })
 }
 
 function incoming(ws, message) {

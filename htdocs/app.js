@@ -2,9 +2,26 @@ var vm = new Vue({
 	el: '#app',
 	data: {
 		drawer: false,
+        view: 'socket',
 		connected: false,
 		auth: false,
-		sockets: {}
+		sockets: {},
+        headers: [
+            {
+              text: 'Socket name',
+              align: 'left',
+              sortable: false,
+              value: 'name'
+            },
+            { text: 'Action', value: 'action' },
+            { text: 'Minute', value: 'minute' },
+            { text: 'Hour', value: 'hour' },
+            { text: 'Day of Month', value: 'dom' },
+            { text: 'Month', value: 'month' },
+            { text: 'Day of Week', value: 'dow' }
+        ],
+        timers: []
+
 	},
 	methods: {
 		power: function(id, action) {
@@ -15,7 +32,11 @@ var vm = new Vue({
 			})
 			var raw = {'type': 'sockets', 'sockets': this.sockets}
 			ws.send(JSON.stringify(raw))
-		}
+		},
+        setView: function(view) {
+            this.view = view
+            drawer = false
+        }
 	}
 })
 
@@ -63,6 +84,9 @@ function incoming(input) {
 		case 'sockets':
 			vm.sockets = data.sockets
 			break
+        case 'timers':
+            vm.timers = data.timers
+            break
 	}
 	console.log(vm.sockets)
 }
