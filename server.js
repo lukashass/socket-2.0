@@ -83,7 +83,6 @@ function initConnection(ws) {
 }
 
 function incoming(ws, message) {
-	console.log('received')
 
 	// temp var to find changes
 	var data
@@ -98,9 +97,25 @@ function incoming(ws, message) {
 	switch (data.type) {
 		case 'sockets':
 			updateSockets(data.sockets)
-            broadcastOthers(ws)
+            var raw = {
+                'type': 'sockets',
+                'sockets': sockets
+            }
+            broadcastOthers(ws, raw)
 			break
+        case 'timers':
+            console.log(timers);
+            updateTimers(data.timers)
+            initJobs()
+            var raw = {
+                'type': 'timers',
+                'timers': timers
+            }
+            broadcastOthers(ws, raw)
+            break
 	}
+
+    console.log('received: ' + data.type)
 }
 
 function sendConnection (ws, data) {
@@ -131,13 +146,10 @@ function updateSockets(data){
 	}
 }
 
-function broadcastOthers(ws) {
+function broadcastOthers(ws, raw) {
     wss.clients.forEach( function(client) {
         if(client !== ws && client.readyState === WebSocket.OPEN){
-            sendConnection(client, {
-                'type': 'sockets',
-                'sockets': sockets
-            })
+            sendConnection(client, raw)
         }
     })
 }
@@ -154,8 +166,9 @@ function broadcastAll() {
 }
 
 function initJobs() {
-    timers.forEach( function(timer) {
-        jobs[timer.id] = schedule.scheduleJob(timer.minute + ' ' + timer.hour + ' * * *', function(){
+    clearJobs()
+    timers.forEach( function(timer, i) {
+        jobs[i] = schedule.scheduleJob(timer.minute + ' ' + timer.hour + ' * * *', function(){
             if(sockets[timer.socket_id].status != timer.action) {
 
                 var data = JSON.parse(JSON.stringify(sockets)) // deep copy of sockets
@@ -167,4 +180,22 @@ function initJobs() {
             }
         })
     })
+}
+
+function clearJobs(){
+    jobs.forEach( function(job) {
+        job.cancel()
+    })
+    jobs = []
+}
+
+function updateTimers(data) {
+    data.forEach( function(timer, i) {
+        if(timer != timers[i]){
+            db.query('UPDATE timers SET action = ?, minute = ?, hour = ?, dom = ?, month = ?, dow = ? WHERE id = ?', [timer.action, timer.minute, timer.hour, timer.dom, timer.month, timer.dow, timer.id], function (error, results, fields) {
+                if (error) throw error
+            })
+        }
+    })
+    timers = data
 }

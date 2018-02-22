@@ -98,29 +98,58 @@
                             <td class="text-xs-right">{{ props.item.dom }}</td>
                             <td class="text-xs-right">{{ props.item.month }}</td>
                             <td class="text-xs-right">{{ props.item.dow }}</td>
+                            <td class="justify-center layout px-0">
+                              <v-btn icon class="mx-0" @click="editTimer(props.item)">
+                                <v-icon color="teal">edit</v-icon>
+                              </v-btn>
+                            </td>
                         </template>
                     </v-data-table>
                 </v-container>
+                <v-dialog v-model="dialog" max-width="500px">
+                  <!--<v-btn color="primary" dark slot="activator" class="mb-2">New Item</v-btn>-->
+                  <v-card>
+                    <v-card-title>
+                      <span class="headline">{{ formTitle }}</span>
+                    </v-card-title>
+                    <v-card-text>
+                      <v-container grid-list-md>
+                        <v-layout wrap>
+                          <v-flex xs12 sm6 md4>
+                            <v-text-field label="socket id" v-model="editedTimer.socket_id"></v-text-field>
+                          </v-flex>
+                          <v-flex xs12 sm6 md4>
+                            <v-text-field label="action" v-model="editedTimer.action"></v-text-field>
+                          </v-flex>
+                          <v-flex xs12 sm6 md4>
+                            <v-text-field label="minute" v-model="editedTimer.minute"></v-text-field>
+                          </v-flex>
+                          <v-flex xs12 sm6 md4>
+                            <v-text-field label="hour" v-model="editedTimer.hour"></v-text-field>
+                          </v-flex>
+                          <v-flex xs12 sm6 md4>
+                            <v-text-field label="dom" v-model="editedTimer.dom"></v-text-field>
+                          </v-flex>
+                          <v-flex xs12 sm6 md4>
+                            <v-text-field label="month" v-model="editedTimer.month"></v-text-field>
+                          </v-flex>
+                          <v-flex xs12 sm6 md4>
+                            <v-text-field label="dow" v-model="editedTimer.dow"></v-text-field>
+                          </v-flex>
+                        </v-layout>
+                      </v-container>
+                    </v-card-text>
+                    <v-card-actions>
+                      <v-spacer></v-spacer>
+                      <v-btn color="blue darken-1" flat @click.native="close">Cancel</v-btn>
+                      <v-btn color="blue darken-1" flat @click.native="save">Save</v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-dialog>
 			</v-content>
 		</v-app>
 
 	</div>
-	  <!--<main>
-	    <v-container>
-	    	{{ message }}
-			<div v-if="trello > 0">
-				<p>Ich fahre gerne {{ trello }} zuege</p>
-			</div>
-			<div>
-				<input v-model="trello">
-				<button v-on:click="foo(field)">Klick mich!</button>
-			</div>
-			<div v-for="socket in sockets">
-				<p>{{ socket.name }} - {{ socket.status }}</p>
-			</div>
-	    </v-container>
-	  </main>-->
-
 
 	<script src="https://unpkg.com/vue/dist/vue.js"></script>
 	<script src="https://unpkg.com/vuetify/dist/vuetify.js"></script>
