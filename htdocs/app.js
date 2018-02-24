@@ -1,11 +1,18 @@
 var vm = new Vue({
 	el: '#app',
 	data: {
+        // UI
 		drawer: false,
         view: 'socket',
         dialog: false,
+
+        // websocket
 		connected: false,
-		auth: false,
+		auth: true,
+        password: '',
+        pwVis: true,
+
+        // backend
 		sockets: {},
         headers: [
             {
@@ -89,6 +96,9 @@ var vm = new Vue({
         timer: function() {
             var raw = {'type': 'timers', 'timers': this.timers}
             this.send(raw)
+        },
+        login: function() {
+            console.log(password)
         }
 	},
     computed: {
@@ -105,7 +115,13 @@ var vm = new Vue({
 })
 
 // Create WebSocket connection.
-var ws = connectWebsocket('wss://' + window.location.hostname + '/websocket/')
+if (window.location.protocol === "https:") {
+    var protocol = "wss:"
+} else {
+    var protocol = "ws:"
+}
+
+var ws = connectWebsocket(protocol + '//' + window.location.hostname + '/websocket/')
 
 function connectWebsocket(url) {
 
@@ -115,7 +131,7 @@ function connectWebsocket(url) {
     result.onopen = function (event) {
     	console.log('WebSocket: connected')
     	vm.connected = true
-    	vm.auth = false
+    	vm.auth = true //TODO
     }
 
     // Listen for messages

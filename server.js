@@ -192,7 +192,7 @@ function clearJobs(){
 function updateTimers(data) {
     data.forEach( function(timer, i) {
         if(timer != timers[i]){
-            db.query('UPDATE timers SET action = ?, minute = ?, hour = ?, dom = ?, month = ?, dow = ? WHERE id = ?', [timer.action, timer.minute, timer.hour, timer.dom, timer.month, timer.dow, timer.id], function (error, results, fields) {
+            db.query('UPDATE timers SET socket_id = ?, action = ?, minute = ?, hour = ?, dom = ?, month = ?, dow = ? WHERE id = ?', [timer.socket_id, timer.action, timer.minute, timer.hour, timer.dom, timer.month, timer.dow, timer.id], function (error, results, fields) {
                 if (error) throw error
             })
         }
