@@ -4,10 +4,10 @@ const cmd = require('node-cmd')
 const schedule = require('node-schedule')
 const CONFIG = require('./config.json')
 const mysqlCon = {
-        host     : CONFIG.dbHost,
-        user     : CONFIG.dbUser,
-        password : CONFIG.dbPassword,
-        database : CONFIG.dbName
+    host     : CONFIG.dbHost,
+    user     : CONFIG.dbUser,
+    password : CONFIG.dbPassword,
+    database : CONFIG.dbName
 }
 
 var db = mysql.createConnection(mysqlCon)
@@ -32,7 +32,7 @@ db.query('SELECT * FROM timers', function (error, results, fields) {
 	timers = results
 
     initJobs()
-});
+})
 
 wss.on('connection', function connection(ws) {
 
@@ -47,7 +47,7 @@ wss.on('connection', function connection(ws) {
 	ws.on('pong', () => {
       		ws.isAlive = true
     })
-});
+})
 
 // WebSocket keep alive pings
 setInterval(() => {
@@ -69,17 +69,7 @@ db.on('error', function(err) {
 
 function initConnection(ws) {
 	ws.isAlive = true
-
-	// initial data for client
-	sendConnection(ws, {
-		'type': 'sockets',
-		'sockets': sockets
-	})
-
-    sendConnection(ws, {
-        'type': 'timers',
-        'timers': timers
-    })
+    ws.auth = false
 }
 
 function incoming(ws, message) {
@@ -94,24 +84,37 @@ function incoming(ws, message) {
 		console.log(e)
 	}
 
-	switch (data.type) {
-		case 'sockets':
-			updateSockets(data.sockets)
-            var raw = {
-                'type': 'sockets',
-                'sockets': sockets
+    if (ws.auth) {
+    	switch (data.type) {
+    		case 'sockets':
+    			updateSockets(data.sockets)
+                var raw = {
+                    'type': 'sockets',
+                    'sockets': sockets
+                }
+                broadcastOthers(ws, raw)
+    			break
+            case 'timers':
+                console.log(timers);
+                updateTimers(data.timers)
+                initJobs()
+                var raw = {
+                    'type': 'timers',
+                    'timers': timers
+                }
+                broadcastOthers(ws, raw)
+                break
+            case 'logout':
+                authConnection(ws, false)
+                break
+        }
+    }
+    switch (data.type) {
+        case 'login':
+            if(data.password === CONFIG.wsPassword) {
+                authConnection(ws, true)
+                initialData(ws)
             }
-            broadcastOthers(ws, raw)
-			break
-        case 'timers':
-            console.log(timers);
-            updateTimers(data.timers)
-            initJobs()
-            var raw = {
-                'type': 'timers',
-                'timers': timers
-            }
-            broadcastOthers(ws, raw)
             break
 	}
 
@@ -124,14 +127,22 @@ function sendConnection (ws, data) {
 	}
 }
 
+function authConnection(ws, state) {
+    ws.auth = state
+    sendConnection(ws, {
+        'type': 'auth',
+        'auth': ws.auth
+    })
+}
+
 function updateSockets(data){
 	var old = sockets
 	sockets = data
-	if(sockets.length == old.length) { // test not really good enough
+    if (sockets.length == old.length) { // test not really good enough
 
-		sockets.forEach( function(item, i) {
-			// sockets[i] === item
-			//if(sockets[i] != old[i]) {
+        sockets.forEach( function(item, i) {
+            // sockets[i] === item
+            //if(sockets[i] != old[i]) {
             if(item.status != old[i].status) { // okay for now, only changing status anyway
 
 				db.query('UPDATE sockets SET status = ? WHERE id = ?', [item.status, item.id], function (error, results, fields) {
@@ -143,7 +154,7 @@ function updateSockets(data){
 				}
 			}
 		})
-	}
+    }
 }
 
 function broadcastOthers(ws, raw) {
@@ -198,4 +209,17 @@ function updateTimers(data) {
         }
     })
     timers = data
+}
+
+function initialData(ws) {
+    // initial data for client
+    sendConnection(ws, {
+        'type': 'sockets',
+        'sockets': sockets
+    })
+
+    sendConnection(ws, {
+        'type': 'timers',
+        'timers': timers
+    })
 }

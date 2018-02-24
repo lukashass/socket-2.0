@@ -3,5 +3,6 @@
     "dbUser": "user",
     "dbPassword": "password",
     "dbName": "database",
-    "wsPort": "1234"
+    "wsPort": "1234",
+    "wsPassword": "8080"
 }

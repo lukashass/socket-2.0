@@ -8,7 +8,7 @@ var vm = new Vue({
 
         // websocket
 		connected: false,
-		auth: true,
+		auth: false,
         password: '',
         pwVis: true,
 
@@ -94,11 +94,16 @@ var vm = new Vue({
             this.close()
         },
         timer: function() {
-            var raw = {'type': 'timers', 'timers': this.timers}
-            this.send(raw)
+            this.send({'type': 'timers', 'timers': this.timers})
         },
         login: function() {
-            console.log(password)
+			this.send({'type': 'login', 'password': this.password})
+            this.password = ''
+        },
+        logout: function() {
+            vm.sockets = {}
+            vm.timers = []
+            this.send({'type': 'logout'})
         }
 	},
     computed: {
@@ -131,7 +136,7 @@ function connectWebsocket(url) {
     result.onopen = function (event) {
     	console.log('WebSocket: connected')
     	vm.connected = true
-    	vm.auth = true //TODO
+    	vm.auth = false
     }
 
     // Listen for messages
@@ -166,6 +171,9 @@ function incoming(input) {
 			break
         case 'timers':
             vm.timers = data.timers
+            break
+        case 'auth':
+            vm.auth = data.auth
             break
 	}
 	console.log('received: ' + data.type)

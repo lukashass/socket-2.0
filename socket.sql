@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Feb 12, 2018 at 12:27 AM
+-- Generation Time: Feb 24, 2018 at 09:39 PM
 -- Server version: 10.1.26-MariaDB-0+deb9u1
 -- PHP Version: 7.0.27-0+deb9u1
 
@@ -39,6 +39,23 @@ CREATE TABLE `sockets` (
   `status` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `timers`
+--
+
+CREATE TABLE `timers` (
+  `id` int(11) NOT NULL,
+  `socket_id` int(11) NOT NULL,
+  `action` int(11) NOT NULL,
+  `minute` varchar(255) NOT NULL DEFAULT '*',
+  `hour` varchar(255) NOT NULL DEFAULT '*',
+  `dom` varchar(255) NOT NULL DEFAULT '*',
+  `month` varchar(255) NOT NULL DEFAULT '*',
+  `dow` varchar(255) NOT NULL DEFAULT '*'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 --
 -- Indexes for dumped tables
 --
@@ -50,6 +67,12 @@ ALTER TABLE `sockets`
   ADD UNIQUE KEY `id` (`id`);
 
 --
+-- Indexes for table `timers`
+--
+ALTER TABLE `timers`
+  ADD UNIQUE KEY `id` (`id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -57,7 +80,13 @@ ALTER TABLE `sockets`
 -- AUTO_INCREMENT for table `sockets`
 --
 ALTER TABLE `sockets`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT for table `timers`
+--
+ALTER TABLE `timers`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
