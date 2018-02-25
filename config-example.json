@@ -4,5 +4,8 @@
     "dbPassword": "password",
     "dbName": "database",
     "wsPort": "1234",
-    "wsPassword": "8080"
+    "auth": {
+      "password": "0000",
+      "cookie": "monster"
+    }
 }

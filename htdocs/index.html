@@ -155,9 +155,9 @@
                         :append-icon="pwVis ? 'visibility' : 'visibility_off'"
                         :append-icon-cb="() => (pwVis = !pwVis)"
                         :type="pwVis ? 'password' : 'text'"
-                        @keyup.enter="login" >
+                        @keyup.enter="login(password)" >
                     </v-text-field>
-                    <v-btn @click="login" :disabled="password == ''">Login</v-btn>
+                    <v-btn @click="login(password)" :disabled="password == ''">Login</v-btn>
                 </v-container>
             </v-content>
 		</v-app>

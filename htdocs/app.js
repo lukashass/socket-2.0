@@ -1,3 +1,5 @@
+Vue.config.devtools = true
+
 var vm = new Vue({
 	el: '#app',
 	data: {
@@ -48,6 +50,7 @@ var vm = new Vue({
         }
 
 	},
+
 	methods: {
         send: function(raw) {
             ws.send(JSON.stringify(raw))
@@ -96,13 +99,14 @@ var vm = new Vue({
         timer: function() {
             this.send({'type': 'timers', 'timers': this.timers})
         },
-        login: function() {
-			this.send({'type': 'login', 'password': this.password})
+        login: function(password) {
+			this.send({'type': 'login', 'password': password})
             this.password = ''
         },
         logout: function() {
-            vm.sockets = {}
-            vm.timers = []
+            this.sockets = {}
+            this.timers = []
+            document.cookie = "auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
             this.send({'type': 'logout'})
         }
 	},
@@ -137,6 +141,7 @@ function connectWebsocket(url) {
     	console.log('WebSocket: connected')
     	vm.connected = true
     	vm.auth = false
+        vm.login(getCookie('auth'))
     }
 
     // Listen for messages
@@ -174,8 +179,32 @@ function incoming(input) {
             break
         case 'auth':
             vm.auth = data.auth
+            if (vm.auth) {
+                setCookie('auth', data.cookie, 3000)
+            }
             break
 	}
 	console.log('received: ' + data.type)
 }
-Vue.config.devtools = true
+
+function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    var expires = "expires="+d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}

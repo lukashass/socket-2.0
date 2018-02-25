@@ -111,7 +111,7 @@ function incoming(ws, message) {
     }
     switch (data.type) {
         case 'login':
-            if(data.password === CONFIG.wsPassword) {
+            if(data.password === CONFIG.auth.password || data.password === CONFIG.auth.cookie) {
                 authConnection(ws, true)
                 initialData(ws)
             }
@@ -129,10 +129,14 @@ function sendConnection (ws, data) {
 
 function authConnection(ws, state) {
     ws.auth = state
-    sendConnection(ws, {
-        'type': 'auth',
-        'auth': ws.auth
-    })
+    if(ws.auth) {
+        sendConnection(ws, {
+            'type': 'auth',
+            'auth': ws.auth,
+            'cookie': CONFIG.auth.cookie
+        })
+    }
+
 }
 
 function updateSockets(data){
