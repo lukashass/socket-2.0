@@ -4,13 +4,13 @@ const cmd = require('node-cmd')
 const schedule = require('node-schedule')
 const CONFIG = require('./config.json')
 const mysqlCon = {
-    host     : CONFIG.dbHost,
-    user     : CONFIG.dbUser,
-    password : CONFIG.dbPassword,
-    database : CONFIG.dbName
+    host     : CONFIG.db.host,
+    user     : CONFIG.db.user,
+    password : CONFIG.db.password,
+    database : CONFIG.db.name
 }
 
-var db = mysql.createConnection(mysqlCon)
+var db = connectMysql(mysqlCon)
 
 const wss = new WebSocket.Server({ port: CONFIG.wsPort })
 
@@ -59,13 +59,19 @@ setInterval(() => {
 	})
 }, 30000)
 
-db.on('error', function(err) {
-	if(err.code == 'PROTOCOL_CONNECTION_LOST') {
-		db = mysql.createConnection(mysqlCon);
-	}
-	console.log(err.code); // 'ER_BAD_DB_ERROR'
-});
+function connectMysql(connection) {
 
+    var result = mysql.createConnection(connection)
+
+    result.on('error', function(err) {
+    	if(err.code == 'PROTOCOL_CONNECTION_LOST') {
+    		db = connectMysql(connection)
+    	}
+    	console.log(err.code) // 'ER_BAD_DB_ERROR'
+    })
+
+    return result
+}
 
 function initConnection(ws) {
 	ws.isAlive = true
