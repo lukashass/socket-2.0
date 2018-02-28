@@ -66,7 +66,7 @@ var vm = new Vue({
 		},
         setView: function(view) {
             this.view = view
-            this.drawer = false
+            this.drawer = window.innerWidth > 1024 // 1024px = Responsive level laptop
         },
         editTimer (item) {
             this.editedIndex = this.timers.indexOf(item)
