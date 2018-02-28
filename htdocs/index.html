@@ -115,7 +115,7 @@
                     </v-data-table>
                 </v-container>
                 <v-dialog v-model="dialog" max-width="500px">
-                  <!--<v-btn color="primary" dark slot="activator" class="mb-2">New Item</v-btn>-->
+                  <v-btn color="cyan darken-2" v-show="view=='timer'" dark slot="activator" class="mb-2">New Timer</v-btn>
                   <v-card>
                     <v-card-title>
                       <span class="headline">{{ formTitle }}</span>
@@ -124,33 +124,50 @@
                       <v-container grid-list-md>
                         <v-layout wrap>
                           <v-flex xs12 sm6 md4>
-                            <v-text-field label="socket id" v-model="editedTimer.socket_id"></v-text-field>
+                            <v-select
+                              :items="sockets"
+                              item-text="name"
+                              item-value="id"
+                              v-model="editedTimer.socket_id"
+                              hint="socket"
+                              persistent-hint
+                              single-line
+                              bottom
+                              required
+                            ></v-select>
                           </v-flex>
                           <v-flex xs12 sm6 md4>
-                            <v-text-field label="action" v-model="editedTimer.action"></v-text-field>
+                            <v-select
+                              :items="[{text: 'On', value: 1}, {text: 'Off', value: 0}]"
+                              v-model="editedTimer.action"
+                              hint="action"
+                              persistent-hint
+                              single-line
+                              bottom
+                            ></v-select>
                           </v-flex>
                           <v-flex xs12 sm6 md4>
-                            <v-text-field label="minute" v-model="editedTimer.minute"></v-text-field>
+                            <v-text-field hint="minute (0-59)" persistent-hint v-model="editedTimer.minute"></v-text-field>
                           </v-flex>
                           <v-flex xs12 sm6 md4>
-                            <v-text-field label="hour" v-model="editedTimer.hour"></v-text-field>
+                            <v-text-field hint="hour (0-23)" persistent-hint v-model="editedTimer.hour"></v-text-field>
                           </v-flex>
                           <v-flex xs12 sm6 md4>
-                            <v-text-field label="dom" v-model="editedTimer.dom"></v-text-field>
+                            <v-text-field hint="day of month (1-31)" persistent-hint v-model="editedTimer.dom"></v-text-field>
                           </v-flex>
                           <v-flex xs12 sm6 md4>
-                            <v-text-field label="month" v-model="editedTimer.month"></v-text-field>
+                            <v-text-field hint="month (1-12)" persistent-hint v-model="editedTimer.month"></v-text-field>
                           </v-flex>
                           <v-flex xs12 sm6 md4>
-                            <v-text-field label="dow" v-model="editedTimer.dow"></v-text-field>
+                            <v-text-field hint="day of week (0-7)" persistent-hint v-model="editedTimer.dow"></v-text-field>
                           </v-flex>
                         </v-layout>
                       </v-container>
                     </v-card-text>
                     <v-card-actions>
                       <v-spacer></v-spacer>
-                      <v-btn color="blue darken-1" flat @click.native="close">Cancel</v-btn>
-                      <v-btn color="blue darken-1" flat @click.native="save">Save</v-btn>
+                      <v-btn color="cyan darken-2" flat @click.native="close">Cancel</v-btn>
+                      <v-btn color="cyan darken-2" flat @click.native="save">Save</v-btn>
                     </v-card-actions>
                   </v-card>
                 </v-dialog>

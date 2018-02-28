@@ -101,7 +101,7 @@ function incoming(ws, message) {
                 broadcastOthers(ws, raw)
     			break
             case 'timers':
-                console.log(timers);
+                console.log(data.timers);
                 updateTimers(data.timers)
                 initJobs()
                 var raw = {
@@ -189,7 +189,7 @@ function broadcastAll() {
 function initJobs() {
     clearJobs()
     timers.forEach( function(timer, i) {
-        jobs[i] = schedule.scheduleJob(timer.minute + ' ' + timer.hour + ' * * *', function(){
+        jobs[i] = schedule.scheduleJob(timer.minute + ' ' + timer.hour + ' ' + timer.dom + ' ' + timer.month + ' ' + timer.dow, function(){
             if(sockets[timer.socket_id].status != timer.action) {
 
                 var data = JSON.parse(JSON.stringify(sockets)) // deep copy of sockets
@@ -213,9 +213,15 @@ function clearJobs(){
 function updateTimers(data) {
     data.forEach( function(timer, i) {
         if(timer != timers[i]){
-            db.query('UPDATE timers SET socket_id = ?, action = ?, minute = ?, hour = ?, dom = ?, month = ?, dow = ? WHERE id = ?', [timer.socket_id, timer.action, timer.minute, timer.hour, timer.dom, timer.month, timer.dow, timer.id], function (error, results, fields) {
-                if (error) throw error
-            })
+            if(i >= timers.length){
+                db.query('INSERT INTO timers (socket_id, action, minute, hour, dom, month, dow) VALUES (?, ?, ?, ?, ?, ?, ?)', [timer.socket_id, timer.action, timer.minute, timer.hour, timer.dom, timer.month, timer.dow, timer.id], function (error, results, fields) {
+                    if (error) throw error
+                })
+            } else {
+                db.query('UPDATE timers SET socket_id = ?, action = ?, minute = ?, hour = ?, dom = ?, month = ?, dow = ? WHERE id = ?', [timer.socket_id, timer.action, timer.minute, timer.hour, timer.dom, timer.month, timer.dow, timer.id], function (error, results, fields) {
+                    if (error) throw error
+                })
+            }
         }
     })
     timers = data

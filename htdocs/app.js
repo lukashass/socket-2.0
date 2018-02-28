@@ -15,7 +15,7 @@ var vm = new Vue({
         pwVis: true,
 
         // backend
-		sockets: {},
+		sockets: [],
         headers: [
             {
               text: 'Socket name',
@@ -35,18 +35,22 @@ var vm = new Vue({
 
         editedIndex: -1,
         editedTimer: {
-            socket_id: -1,
+            socket_id: 0,
             action: 0,
             minute: '*',
             hour: '*',
-            dom: '*'
+            dom: '*',
+            month: '*',
+            dow: '*'
         },
         defaultTimer: {
-            socket_id: -1,
+            socket_id: 0,
             action: 0,
             minute: '*',
             hour: '*',
-            dom: '*'
+            dom: '*',
+            month: '*',
+            dow: '*'
         }
 
 	},
@@ -113,7 +117,7 @@ var vm = new Vue({
 	},
     computed: {
         formTitle () {
-            return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+            return this.editedIndex === -1 ? 'New Timer' : 'Edit Timer'
         }
     },
 
