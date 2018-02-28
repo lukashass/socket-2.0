@@ -4,7 +4,7 @@ var vm = new Vue({
 	el: '#app',
 	data: {
         // UI
-		drawer: false,
+		drawer: null,
         view: 'socket',
         dialog: false,
 
