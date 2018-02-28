@@ -66,7 +66,7 @@ var vm = new Vue({
 		},
         setView: function(view) {
             this.view = view
-            drawer = false
+            this.drawer = false
         },
         editTimer (item) {
             this.editedIndex = this.timers.indexOf(item)

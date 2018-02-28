@@ -17,7 +17,7 @@
 		<v-app>
 			<v-navigation-drawer v-model="drawer" fixed app clipped>
 				<v-list dense>
-					<v-list-tile @click="setView('socket')">
+					<v-list-tile @click.stop="setView('socket')">
 					  <v-list-tile-action>
 					    <v-icon>mdi-power-plug</v-icon>
 					  </v-list-tile-action>
@@ -25,7 +25,7 @@
 					    <v-list-tile-title>Sockets</v-list-tile-title>
 					  </v-list-tile-content>
 					</v-list-tile>
-                    <v-list-tile @click="setView('timer')">
+                    <v-list-tile @click.stop="setView('timer')">
 					  <v-list-tile-action>
 					    <v-icon>alarm</v-icon>
 					  </v-list-tile-action>
@@ -33,7 +33,7 @@
 					    <v-list-tile-title>Timers</v-list-tile-title>
 					  </v-list-tile-content>
 					</v-list-tile>
-                    <v-list-tile @click="logout()">
+                    <v-list-tile @click.stop="logout(); drawer = false">
 					  <v-list-tile-action>
 					    <v-icon>exit_to_app</v-icon>
 					  </v-list-tile-action>
