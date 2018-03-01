@@ -101,6 +101,7 @@
                         <template slot="items" slot-scope="props">
                             <td>{{ sockets[props.item.socket_id].name }}</td>
                             <td class="text-xs-center">{{ props.item.action }}</td>
+                            <td class="text-xs-center">{{ props.item.mode }}</td>
                             <td class="text-xs-center">{{ props.item.minute }}</td>
                             <td class="text-xs-center">{{ props.item.hour }}</td>
                             <td class="text-xs-center">{{ props.item.dom }}</td>
@@ -138,7 +139,7 @@
                           </v-flex>
                           <v-flex xs12 sm6 md4>
                             <v-select
-                              :items="[{text: 'On', value: 1}, {text: 'Off', value: 0}]"
+                              :items="actions"
                               v-model="editedTimer.action"
                               hint="action"
                               persistent-hint

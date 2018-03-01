@@ -24,6 +24,7 @@ var vm = new Vue({
               value: 'name'
             },
             { text: 'Action', value: 'action' },
+            { text: 'Mode', value: 'mode' },
             { text: 'Minute', value: 'minute' },
             { text: 'Hour', value: 'hour' },
             { text: 'Day of Month', value: 'dom' },
@@ -33,6 +34,7 @@ var vm = new Vue({
         ],
         timers: [],
 
+        // timer dialog
         editedIndex: -1,
         editedTimer: {
             socket_id: 0,
@@ -60,6 +62,10 @@ var vm = new Vue({
             {text: 'Sunrise', value: 'sunrise'},
             {text: 'Sunset', value: 'sunset'},
             {text: 'Dusk', value: 'dusk'}
+        ],
+        actions: [
+            {text: 'On', value: 1},
+            {text: 'Off', value: 0}
         ]
 
 	},
