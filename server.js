@@ -32,7 +32,7 @@ db.query('SELECT * FROM timers', function (error, results, fields) {
 
 	timers = results
 
-    initJobs()
+    updateJobs()
 })
 
 wss.on('connection', function connection(ws) {
@@ -59,6 +59,11 @@ setInterval(() => {
 		ws.ping(() => {})
 	})
 }, 30000)
+
+// refresh Jobs regularly because sunTimes change
+var refresh = schedule.scheduleJob(CONFIG.jobRefresh, function(){
+    updateJobs()
+})
 
 function connectMysql(connection) {
 
@@ -104,7 +109,7 @@ function incoming(ws, message) {
             case 'timers':
                 console.log(data.timers);
                 updateTimers(data.timers)
-                initJobs()
+                updateJobs()
                 var raw = {
                     'type': 'timers',
                     'timers': timers
@@ -187,17 +192,16 @@ function broadcastAll() {
     })
 }
 
-function initJobs() {
+function updateJobs() {
     clearJobs()
     var sunTimes
     timers.forEach( function(timer, i) {
-        console.log(sunTimes);
+
         // set sunTimes once
         if(timer.mode != 'time' && sunTimes == null){
             sunTimes = SunCalc.getTimes(new Date(), CONFIG.loc.lat, CONFIG.loc.lng)
-            console.log('einmal');
         }
-        
+
         jobs[i] = schedule.scheduleJob(jobTime(timer, sunTimes), function(){
             if(sockets[timer.socket_id].status != timer.action) {
 
@@ -240,7 +244,6 @@ function jobTime(timer, sunTimes) {
         default:
             result = '* * * * *'
     }
-    console.log(result);
     return result
 }
 

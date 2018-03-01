@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.7.6
+-- version 4.7.0
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Feb 24, 2018 at 09:39 PM
--- Server version: 10.1.26-MariaDB-0+deb9u1
--- PHP Version: 7.0.27-0+deb9u1
+-- Generation Time: Mar 01, 2018 at 03:00 PM
+-- Server version: 5.7.21-0ubuntu0.16.04.1
+-- PHP Version: 7.0.25-0ubuntu0.16.04.1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
@@ -49,6 +49,7 @@ CREATE TABLE `timers` (
   `id` int(11) NOT NULL,
   `socket_id` int(11) NOT NULL,
   `action` int(11) NOT NULL,
+  `mode` varchar(255) NOT NULL,
   `minute` varchar(255) NOT NULL DEFAULT '*',
   `hour` varchar(255) NOT NULL DEFAULT '*',
   `dom` varchar(255) NOT NULL DEFAULT '*',
@@ -81,13 +82,11 @@ ALTER TABLE `timers`
 --
 ALTER TABLE `sockets`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
 --
 -- AUTO_INCREMENT for table `timers`
 --
 ALTER TABLE `timers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-COMMIT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
