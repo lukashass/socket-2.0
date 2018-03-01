@@ -9,7 +9,12 @@
     },
 
     "auth": {
-      "password": "0000",
-      "cookie": "monster"
+        "password": "0000",
+        "cookie": "monster"
+    },
+
+    "loc": {
+        "lat": 51.0,
+        "lng": 0.0
     }
 }

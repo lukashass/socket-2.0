@@ -146,6 +146,17 @@
                               bottom
                             ></v-select>
                           </v-flex>
+                            <v-flex xs12 sm6 md4>
+                              <v-select
+                                :items="modes"
+                                v-model="editedTimer.mode"
+                                hint="mode"
+                                persistent-hint
+                                single-line
+                                bottom
+                              ></v-select>
+                            </v-flex>
+                            <template v-if="editedTimer.mode=='time'">
                           <v-flex xs12 sm6 md4>
                             <v-text-field hint="minute (0-59)" persistent-hint v-model="editedTimer.minute"></v-text-field>
                           </v-flex>
@@ -161,6 +172,7 @@
                           <v-flex xs12 sm6 md4>
                             <v-text-field hint="day of week (0-7)" persistent-hint v-model="editedTimer.dow"></v-text-field>
                           </v-flex>
+                      </template>
                         </v-layout>
                       </v-container>
                     </v-card-text>

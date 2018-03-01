@@ -2,6 +2,7 @@ const WebSocket = require('ws')
 const mysql = require('mysql')
 const cmd = require('node-cmd')
 const schedule = require('node-schedule')
+const SunCalc = require('suncalc')
 const CONFIG = require('./config.json')
 const mysqlCon = {
     host     : CONFIG.db.host,
@@ -188,8 +189,16 @@ function broadcastAll() {
 
 function initJobs() {
     clearJobs()
+    var sunTimes
     timers.forEach( function(timer, i) {
-        jobs[i] = schedule.scheduleJob(timer.minute + ' ' + timer.hour + ' ' + timer.dom + ' ' + timer.month + ' ' + timer.dow, function(){
+        console.log(sunTimes);
+        // set sunTimes once
+        if(timer.mode != 'time' && sunTimes == null){
+            sunTimes = SunCalc.getTimes(new Date(), CONFIG.loc.lat, CONFIG.loc.lng)
+            console.log('einmal');
+        }
+        
+        jobs[i] = schedule.scheduleJob(jobTime(timer, sunTimes), function(){
             if(sockets[timer.socket_id].status != timer.action) {
 
                 var data = JSON.parse(JSON.stringify(sockets)) // deep copy of sockets
@@ -210,15 +219,40 @@ function clearJobs(){
     jobs = []
 }
 
+function jobTime(timer, sunTimes) {
+    var result
+    switch(timer.mode) {
+        case 'dawn':
+            result = sunTimes.dawn.getMinutes() + ' ' + sunTimes.dawn.getHours() + ' * * *'
+            break
+        case 'sunrise':
+            result = sunTimes.sunrise.getMinutes() + ' ' + sunTimes.sunrise.getHours() + ' * * *'
+            break
+        case 'sunset':
+            result = sunTimes.sunset.getMinutes() + ' ' + sunTimes.sunset.getHours() + ' * * *'
+            break
+        case 'dusk':
+            result = sunTimes.dusk.getMinutes() + ' ' + sunTimes.dusk.getHours() + ' * * *'
+            break
+        case 'time':
+            result = timer.minute + ' ' + timer.hour + ' ' + timer.dom + ' ' + timer.month + ' ' + timer.dow
+            break
+        default:
+            result = '* * * * *'
+    }
+    console.log(result);
+    return result
+}
+
 function updateTimers(data) {
     data.forEach( function(timer, i) {
         if(timer != timers[i]){
             if(i >= timers.length){
-                db.query('INSERT INTO timers (socket_id, action, minute, hour, dom, month, dow) VALUES (?, ?, ?, ?, ?, ?, ?)', [timer.socket_id, timer.action, timer.minute, timer.hour, timer.dom, timer.month, timer.dow, timer.id], function (error, results, fields) {
+                db.query('INSERT INTO timers (socket_id, action, mode, minute, hour, dom, month, dow) VALUES (?, ?, ?, ?, ?, ?, ?)', [timer.socket_id, timer.action, timer.mode, timer.minute, timer.hour, timer.dom, timer.month, timer.dow, timer.id], function (error, results, fields) {
                     if (error) throw error
                 })
             } else {
-                db.query('UPDATE timers SET socket_id = ?, action = ?, minute = ?, hour = ?, dom = ?, month = ?, dow = ? WHERE id = ?', [timer.socket_id, timer.action, timer.minute, timer.hour, timer.dom, timer.month, timer.dow, timer.id], function (error, results, fields) {
+                db.query('UPDATE timers SET socket_id = ?, action = ?, mode = ?, minute = ?, hour = ?, dom = ?, month = ?, dow = ? WHERE id = ?', [timer.socket_id, timer.action, timer.mode, timer.minute, timer.hour, timer.dom, timer.month, timer.dow, timer.id], function (error, results, fields) {
                     if (error) throw error
                 })
             }

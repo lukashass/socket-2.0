@@ -37,6 +37,7 @@ var vm = new Vue({
         editedTimer: {
             socket_id: 0,
             action: 0,
+            mode: 'time',
             minute: '*',
             hour: '*',
             dom: '*',
@@ -46,12 +47,20 @@ var vm = new Vue({
         defaultTimer: {
             socket_id: 0,
             action: 0,
+            mode: 'time',
             minute: '*',
             hour: '*',
             dom: '*',
             month: '*',
             dow: '*'
-        }
+        },
+        modes: [
+            {text: 'Time', value: 'time'},
+            {text: 'Dawn', value: 'dawn'},
+            {text: 'Sunrise', value: 'sunrise'},
+            {text: 'Sunset', value: 'sunset'},
+            {text: 'Dusk', value: 'dusk'}
+        ]
 
 	},
 
