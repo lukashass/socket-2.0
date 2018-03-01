@@ -224,26 +224,13 @@ function clearJobs(){
 }
 
 function jobTime(timer, sunTimes) {
-    var result
-    switch(timer.mode) {
-        case 'dawn':
-            result = sunTimes.dawn.getMinutes() + ' ' + sunTimes.dawn.getHours() + ' * * *'
-            break
-        case 'sunrise':
-            result = sunTimes.sunrise.getMinutes() + ' ' + sunTimes.sunrise.getHours() + ' * * *'
-            break
-        case 'sunset':
-            result = sunTimes.sunset.getMinutes() + ' ' + sunTimes.sunset.getHours() + ' * * *'
-            break
-        case 'dusk':
-            result = sunTimes.dusk.getMinutes() + ' ' + sunTimes.dusk.getHours() + ' * * *'
-            break
-        case 'time':
-            result = timer.minute + ' ' + timer.hour + ' ' + timer.dom + ' ' + timer.month + ' ' + timer.dow
-            break
-        default:
-            result = '* * * * *'
+
+    if (timer.mode == 'time') {
+        var result = timer.minute + ' ' + timer.hour + ' ' + timer.dom + ' ' + timer.month + ' ' + timer.dow
+    } else {
+        var result = sunTimes[timer.mode].getMinutes() + ' ' + sunTimes[timer.mode].getHours() + ' * * *'
     }
+
     return result
 }
 
