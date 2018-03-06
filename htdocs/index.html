@@ -102,6 +102,7 @@
                             <td>{{ sockets[props.item.socket_id].name }}</td>
                             <td class="text-xs-center">{{ props.item.action }}</td>
                             <td class="text-xs-center">{{ props.item.mode }}</td>
+                            <td class="text-xs-center">{{ props.item.offset }}</td>
                             <td class="text-xs-center">{{ props.item.minute }}</td>
                             <td class="text-xs-center">{{ props.item.hour }}</td>
                             <td class="text-xs-center">{{ props.item.dom }}</td>
@@ -172,6 +173,11 @@
                           </v-flex>
                           <v-flex xs12 sm6 md4>
                             <v-text-field hint="day of week (0-7)" persistent-hint v-model="editedTimer.dow"></v-text-field>
+                          </v-flex>
+                      </template>
+                      <template v-else>
+                          <v-flex xs12 sm6 md4>
+                            <v-text-field hint="offset (negative means previous to event)" persistent-hint v-model="editedTimer.offset"></v-text-field>
                           </v-flex>
                       </template>
                         </v-layout>

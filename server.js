@@ -228,9 +228,10 @@ function jobTime(timer, sunTimes) {
     if (timer.mode == 'time') {
         var result = timer.minute + ' ' + timer.hour + ' ' + timer.dom + ' ' + timer.month + ' ' + timer.dow
     } else {
-        var result = sunTimes[timer.mode].getMinutes() + ' ' + sunTimes[timer.mode].getHours() + ' * * *'
+        var offsetDate = addMinutes(sunTimes[timer.mode], timer.offset)
+        var result = offsetDate.getMinutes() + ' ' + offsetDate.getHours() + ' * * *'
     }
-
+console.log(result);
     return result
 }
 
@@ -238,11 +239,11 @@ function updateTimers(data) {
     data.forEach( function(timer, i) {
         if(timer != timers[i]){
             if(i >= timers.length){
-                db.query('INSERT INTO timers (socket_id, action, mode, minute, hour, dom, month, dow) VALUES (?, ?, ?, ?, ?, ?, ?)', [timer.socket_id, timer.action, timer.mode, timer.minute, timer.hour, timer.dom, timer.month, timer.dow, timer.id], function (error, results, fields) {
+                db.query('INSERT INTO timers (socket_id, action, mode, offset, minute, hour, dom, month, dow) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [timer.socket_id, timer.action, timer.mode, timer.offset, imer.minute, timer.hour, timer.dom, timer.month, timer.dow, timer.id], function (error, results, fields) {
                     if (error) throw error
                 })
             } else {
-                db.query('UPDATE timers SET socket_id = ?, action = ?, mode = ?, minute = ?, hour = ?, dom = ?, month = ?, dow = ? WHERE id = ?', [timer.socket_id, timer.action, timer.mode, timer.minute, timer.hour, timer.dom, timer.month, timer.dow, timer.id], function (error, results, fields) {
+                db.query('UPDATE timers SET socket_id = ?, action = ?, mode = ?, offset = ?, minute = ?, hour = ?, dom = ?, month = ?, dow = ? WHERE id = ?', [timer.socket_id, timer.action, timer.mode, timer.offset, timer.minute, timer.hour, timer.dom, timer.month, timer.dow, timer.id], function (error, results, fields) {
                     if (error) throw error
                 })
             }
@@ -262,4 +263,8 @@ function initialData(ws) {
         'type': 'timers',
         'timers': timers
     })
+}
+
+function addMinutes(date, minutes) {
+   return new Date(date.getTime() + minutes * 60000);
 }

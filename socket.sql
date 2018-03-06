@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Mar 01, 2018 at 03:00 PM
+-- Generation Time: Mar 06, 2018 at 10:47 AM
 -- Server version: 5.7.21-0ubuntu0.16.04.1
 -- PHP Version: 7.0.25-0ubuntu0.16.04.1
 
@@ -50,6 +50,7 @@ CREATE TABLE `timers` (
   `socket_id` int(11) NOT NULL,
   `action` int(11) NOT NULL,
   `mode` varchar(255) NOT NULL,
+  `offset` int(11) NOT NULL DEFAULT '0',
   `minute` varchar(255) NOT NULL DEFAULT '*',
   `hour` varchar(255) NOT NULL DEFAULT '*',
   `dom` varchar(255) NOT NULL DEFAULT '*',
