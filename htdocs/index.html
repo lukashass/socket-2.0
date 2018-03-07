@@ -59,29 +59,27 @@
 			      <v-layout row wrap>
 					<v-flex v-for="socket in sockets" :key="socket.id" xs12 md4>
 			          <v-card v-bind:class="socket.status == 1 ? 'cyan' : 'blue-grey'" color="darken-2" class="white--text">
-			            <v-container fluid grid-list-lg>
-			              <v-layout row>
+			            <v-container fluid grid-list-lg fill-height>
+			              <v-layout row flex align-center justify-center>
 			                <v-flex xs10>
 			                  <div>
 			                    <div class="headline">{{ socket.name }}</div>
-			                    <div>{{ socket.description }}</div>
+                                <div>{{ socket.description }}</div>
+
 			                  </div>
 			                </v-flex>
 			                <v-flex xs2>
 
-					            <v-btn flat icon dark @click="power(socket.id, 1)">
+					            <v-btn flat icon dark style="margin: 0; margin-bottom: 6px;" @click="power(socket.id, 1)">
 					             	 <v-icon>mdi-power-plug</v-icon>
 					            </v-btn>
-					            <v-btn flat icon dark @click="power(socket.id, 0)">
+					            <v-btn flat icon dark style="margin: 0; margin-top: 6px;" @click="power(socket.id, 0)">
 					             	 <v-icon>mdi-power-plug-off</v-icon>
 					            </v-btn>
 
 			                </v-flex>
 			              </v-layout>
 			            </v-container>
-			             <v-card-actions>
-			            	<v-btn flat dark>edit</v-btn>
-			            </v-card-actions>
 			          </v-card>
 			        </v-flex>
 			      </v-layout>

@@ -231,7 +231,7 @@ function jobTime(timer, sunTimes) {
         var offsetDate = addMinutes(sunTimes[timer.mode], timer.offset)
         var result = offsetDate.getMinutes() + ' ' + offsetDate.getHours() + ' * * *'
     }
-console.log(result);
+
     return result
 }
 
