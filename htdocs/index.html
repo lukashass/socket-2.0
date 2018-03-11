@@ -1,103 +1,90 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-	<title>JSSocket</title>
+    <title>JSSocket</title>
 
-	<link href="img/fav.png" rel="shortcut icon">
+    <link href="img/fav.png" rel="shortcut icon">
 
-	<link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
-	<link href="https://unpkg.com/vuetify/dist/vuetify.min.css" rel="stylesheet">
-	<link rel="stylesheet" href="//cdn.materialdesignicons.com/2.1.19/css/materialdesignicons.min.css">
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
-	<link rel="manifest" href="manifest.json">
+    <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
+    <link href="https://unpkg.com/vuetify/dist/vuetify.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="//cdn.materialdesignicons.com/2.1.19/css/materialdesignicons.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <link rel="manifest" href="manifest.json">
 </head>
+
 <body>
-	<div id="app">
+    <div id="app">
 
-		<v-app>
-			<v-navigation-drawer v-model="drawer" fixed app clipped>
-				<v-list dense>
-					<v-list-tile @click.stop="setView('socket')">
-					  <v-list-tile-action>
-					    <v-icon>mdi-power-plug</v-icon>
-					  </v-list-tile-action>
-					  <v-list-tile-content>
-					    <v-list-tile-title>Sockets</v-list-tile-title>
-					  </v-list-tile-content>
-					</v-list-tile>
+        <v-app>
+            <v-navigation-drawer v-model="drawer" fixed app clipped>
+                <v-list dense>
+                    <v-list-tile @click.stop="setView('socket')">
+                        <v-list-tile-action>
+                            <v-icon>mdi-power-plug</v-icon>
+                        </v-list-tile-action>
+                        <v-list-tile-content>
+                            <v-list-tile-title>Sockets</v-list-tile-title>
+                        </v-list-tile-content>
+                    </v-list-tile>
                     <v-list-tile @click.stop="setView('timer')">
-					  <v-list-tile-action>
-					    <v-icon>alarm</v-icon>
-					  </v-list-tile-action>
-					  <v-list-tile-content>
-					    <v-list-tile-title>Timers</v-list-tile-title>
-					  </v-list-tile-content>
-					</v-list-tile>
+                        <v-list-tile-action>
+                            <v-icon>alarm</v-icon>
+                        </v-list-tile-action>
+                        <v-list-tile-content>
+                            <v-list-tile-title>Timers</v-list-tile-title>
+                        </v-list-tile-content>
+                    </v-list-tile>
                     <v-list-tile @click.stop="logout(); drawer = false">
-					  <v-list-tile-action>
-					    <v-icon>exit_to_app</v-icon>
-					  </v-list-tile-action>
-					  <v-list-tile-content>
-					    <v-list-tile-title>Logout</v-list-tile-title>
-					  </v-list-tile-content>
-					</v-list-tile>
-				</v-list>
-			</v-navigation-drawer>
-			<v-toolbar clipped-left dark fixed app color="blue-grey darken-2">
-				<v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-				<v-toolbar-title class="white--text">JSSocket</v-toolbar-title>
-				<v-spacer></v-spacer>
-			  	<v-icon v-bind:color="connected ? 'white' : 'black'">favorite</v-icon>
-			</v-toolbar>
-			<v-content v-if="auth">
-				<v-container
-			      fluid
-			      style="min-height: 0;"
-			      grid-list-lg
-                  v-show="view=='socket'"
-			    >
-			      <v-layout row wrap>
-					<v-flex v-for="socket in sockets" :key="socket.id" xs12 md4>
-			          <v-card v-bind:class="socket.status == 1 ? 'cyan' : 'blue-grey'" color="darken-2" class="white--text">
-			            <v-container fluid grid-list-lg fill-height>
-			              <v-layout row flex align-center justify-center>
-			                <v-flex xs10>
-			                  <div>
-			                    <div class="headline">{{ socket.name }}</div>
-                                <div>{{ socket.description }}</div>
+                        <v-list-tile-action>
+                            <v-icon>exit_to_app</v-icon>
+                        </v-list-tile-action>
+                        <v-list-tile-content>
+                            <v-list-tile-title>Logout</v-list-tile-title>
+                        </v-list-tile-content>
+                    </v-list-tile>
+                </v-list>
+            </v-navigation-drawer>
+            <v-toolbar clipped-left dark fixed app color="blue-grey darken-2">
+                <v-toolbar-side-icon @click.stop="drawer = !drawer"></v-toolbar-side-icon>
+                <v-toolbar-title class="white--text">JSSocket</v-toolbar-title>
+                <v-spacer></v-spacer>
+                <v-icon v-bind:color="connected ? 'white' : 'black'">favorite</v-icon>
+            </v-toolbar>
+            <v-content v-if="auth">
+                <v-container fluid style="min-height: 0;" grid-list-lg v-show="view=='socket'">
+                    <v-layout row wrap>
+                        <v-flex v-for="socket in sockets" :key="socket.id" v-if="socket !== null" xs12 md4>
+                            <v-card v-bind:class="socket.status == 1 ? 'cyan' : 'blue-grey'" color="darken-2" class="white--text">
+                                <v-container fluid grid-list-lg fill-height>
+                                    <v-layout row flex align-center justify-center>
+                                        <v-flex xs10>
+                                            <div>
+                                                <div class="headline">{{ socket.name }}</div>
+                                                <div>{{ socket.description }}</div>
 
-			                  </div>
-			                </v-flex>
-			                <v-flex xs2>
+                                            </div>
+                                        </v-flex>
+                                        <v-flex xs2>
 
-					            <v-btn flat icon dark style="margin: 0; margin-bottom: 6px;" @click="power(socket.id, 1)">
-					             	 <v-icon>mdi-power-plug</v-icon>
-					            </v-btn>
-					            <v-btn flat icon dark style="margin: 0; margin-top: 6px;" @click="power(socket.id, 0)">
-					             	 <v-icon>mdi-power-plug-off</v-icon>
-					            </v-btn>
+                                            <v-btn flat icon dark style="margin: 0; margin-bottom: 6px;" @click="power(socket.id, 1)">
+                                                <v-icon>mdi-power-plug</v-icon>
+                                            </v-btn>
+                                            <v-btn flat icon dark style="margin: 0; margin-top: 6px;" @click="power(socket.id, 0)">
+                                                <v-icon>mdi-power-plug-off</v-icon>
+                                            </v-btn>
 
-			                </v-flex>
-			              </v-layout>
-			            </v-container>
-			          </v-card>
-			        </v-flex>
-			      </v-layout>
-			    </v-container>
-                <v-container
-                    fluid
-                    style="min-height: 0;"
-                    grid-list-lg
-                    v-show="view=='timer'"
-                >
-                    <v-data-table
-                        :headers="headers"
-                        :items="timers"
-                        hide-actions
-                        class="elevation-1"
-                    >
+                                        </v-flex>
+                                    </v-layout>
+                                </v-container>
+                            </v-card>
+                        </v-flex>
+                    </v-layout>
+                </v-container>
+                <v-container fluid style="min-height: 0;" grid-list-lg v-show="view=='timer'">
+                    <v-data-table :headers="headers" :items="timers" hide-actions class="elevation-1">
                         <template slot="items" slot-scope="props">
-                            <td>{{ sockets[props.item.socket_id].name }}</td>
+                            <td>{{ socketWithID(props.item.socket_id).name }}</td>
                             <td class="text-xs-center">{{ props.item.action }}</td>
                             <td class="text-xs-center">{{ props.item.mode }}</td>
                             <td class="text-xs-center">{{ props.item.offset }}</td>
@@ -115,48 +102,24 @@
                     </v-data-table>
                 </v-container>
                 <v-dialog v-model="dialog" max-width="500px">
-                  <v-btn color="cyan darken-2" v-show="view=='timer'" dark slot="activator" class="mb-2">New Timer</v-btn>
-                  <v-card>
-                    <v-card-title>
-                      <span class="headline">{{ formTitle }}</span>
-                    </v-card-title>
-                    <v-card-text>
-                      <v-container grid-list-md>
-                        <v-layout wrap>
-                          <v-flex xs12 sm6 md4>
-                            <v-select
-                              :items="sockets"
-                              item-text="name"
-                              item-value="id"
-                              v-model="editedTimer.socket_id"
-                              hint="socket"
-                              persistent-hint
-                              single-line
-                              bottom
-                              required
-                            ></v-select>
-                          </v-flex>
-                          <v-flex xs12 sm6 md4>
-                            <v-select
-                              :items="actions"
-                              v-model="editedTimer.action"
-                              hint="action"
-                              persistent-hint
-                              single-line
-                              bottom
-                            ></v-select>
-                          </v-flex>
-                            <v-flex xs12 sm6 md4>
-                              <v-select
-                                :items="modes"
-                                v-model="editedTimer.mode"
-                                hint="mode"
-                                persistent-hint
-                                single-line
-                                bottom
-                              ></v-select>
-                            </v-flex>
-                            <template v-if="editedTimer.mode=='time'">
+                    <v-btn color="cyan darken-2" v-show="view=='timer'" dark slot="activator" class="mb-2">New Timer</v-btn>
+                    <v-card>
+                        <v-card-title>
+                            <span class="headline">{{ formTitle }}</span>
+                        </v-card-title>
+                        <v-card-text>
+                            <v-container grid-list-md>
+                                <v-layout wrap>
+                                    <v-flex xs12 sm6 md4>
+                                        <v-select :items="sockets" item-text="name" item-value="id" v-model="editedTimer.socket_id" hint="socket" persistent-hint single-line bottom required></v-select>
+                                    </v-flex>
+                                    <v-flex xs12 sm6 md4>
+                                        <v-select :items="actions" v-model="editedTimer.action" hint="action" persistent-hint single-line bottom></v-select>
+                                    </v-flex>
+                                    <v-flex xs12 sm6 md4>
+                                        <v-select :items="modes" v-model="editedTimer.mode" hint="mode" persistent-hint single-line bottom></v-select>
+                                    </v-flex>
+                                    <template v-if="editedTimer.mode=='time'">
                           <v-flex xs12 sm6 md4>
                             <v-text-field hint="minute (0-59)" persistent-hint v-model="editedTimer.minute"></v-text-field>
                           </v-flex>
@@ -173,41 +136,36 @@
                             <v-text-field hint="day of week (0-7)" persistent-hint v-model="editedTimer.dow"></v-text-field>
                           </v-flex>
                       </template>
-                      <template v-else>
+                                    <template v-else>
                           <v-flex xs12 sm6 md4>
                             <v-text-field hint="offset (negative means previous to event)" persistent-hint v-model="editedTimer.offset"></v-text-field>
                           </v-flex>
                       </template>
-                        </v-layout>
-                      </v-container>
-                    </v-card-text>
-                    <v-card-actions>
-                      <v-spacer></v-spacer>
-                      <v-btn color="cyan darken-2" flat @click.native="close">Cancel</v-btn>
-                      <v-btn color="cyan darken-2" flat @click.native="save">Save</v-btn>
-                    </v-card-actions>
-                  </v-card>
+                                </v-layout>
+                            </v-container>
+                        </v-card-text>
+                        <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn color="cyan darken-2" flat @click.native="close">Cancel</v-btn>
+                            <v-btn color="cyan darken-2" flat @click.native="save">Save</v-btn>
+                        </v-card-actions>
+                    </v-card>
                 </v-dialog>
-			</v-content>
+            </v-content>
             <v-content v-else>
                 <v-container>
-                    <v-text-field
-                        label="Password"
-                        v-model="password"
-                        :append-icon="pwVis ? 'visibility' : 'visibility_off'"
-                        :append-icon-cb="() => (pwVis = !pwVis)"
-                        :type="pwVis ? 'password' : 'text'"
-                        @keyup.enter="login(password)" >
+                    <v-text-field label="Password" v-model="password" :append-icon="pwVis ? 'visibility' : 'visibility_off'" :append-icon-cb="() => (pwVis = !pwVis)" :type="pwVis ? 'password' : 'text'" @keyup.enter="login(password)">
                     </v-text-field>
                     <v-btn @click="login(password)" :disabled="password == ''">Login</v-btn>
                 </v-container>
             </v-content>
-		</v-app>
+        </v-app>
 
-	</div>
+    </div>
 
-	<script src="https://unpkg.com/vue/dist/vue.js"></script>
-	<script src="https://unpkg.com/vuetify/dist/vuetify.js"></script>
-	<script type="text/javascript" src="app.js"></script>
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/vuetify/dist/vuetify.js"></script>
+    <script type="text/javascript" src="app.js"></script>
 </body>
+
 </html>
