@@ -162,7 +162,7 @@ function updateSockets (data) {
         })
 
         if (sockets[i].status !== old[i].status) {
-          cmd.run('sudo ./codesendRoot ' + (item.status === 1 ? parseInt(item.code_on, 10) : parseInt(item.code_off, 10)) + ' ' + parseInt(item.protocol, 10))
+          cmd.run('sudo ./codesend ' + (item.status === 1 ? parseInt(item.code_on, 10) : parseInt(item.code_off, 10)) + ' ' + parseInt(item.protocol, 10))
         }
       }
     })
