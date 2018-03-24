@@ -60,7 +60,7 @@
         <v-container fluid grid-list-lg v-show="view=='socket'">
           <v-layout row wrap>
             <v-flex v-for="socket in sockets" :key="socket.id" v-if="socket !== null" xs12 sm6 md4>
-              <v-card v-bind:class="socket.status == 1 ? 'cyan' : 'blue-grey'" color="darken-2" class="white--text" style="height: 100%;" @click.native="power(socket.id, !socket.status)">
+              <v-card v-bind:class="socket.status == 1 ? 'cyan' : 'blue-grey'" color="darken-2" class="white--text" style="height: 100%;" @click.native="power(socket.id, socket.status === 0 ? 1 : 0)">
                 <v-container>
                   <v-layout row wrap>
                     <v-flex>
