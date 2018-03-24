@@ -232,7 +232,7 @@ function updateTimers (data) {
   data.forEach(function (timer, i) {
     if (timer !== timers[i]) {
       if (i >= timers.length) {
-        db.query('INSERT INTO timers (socket_id, action, mode, offset, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [timer.socket_id, timer.action, timer.mode, timer.offset, timer.time], function (error, results, fields) {
+        db.query('INSERT INTO timers (socket_id, action, mode, offset, time) VALUES (?, ?, ?, ?, ?)', [timer.socket_id, timer.action, timer.mode, timer.offset, timer.time], function (error, results, fields) {
           if (error) throw error
         })
       } else {
