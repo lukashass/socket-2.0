@@ -26,10 +26,10 @@
         <v-list dense>
           <v-list-tile @click.stop="setView('socket')">
             <v-list-tile-action>
-              <v-icon>mdi-power-plug</v-icon>
+              <v-icon>dashboard</v-icon>
             </v-list-tile-action>
             <v-list-tile-content>
-              <v-list-tile-title>Sockets</v-list-tile-title>
+              <v-list-tile-title>Dashboard</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
           <v-list-tile @click.stop="setView('timer')">
@@ -57,25 +57,17 @@
         <v-icon v-bind:color="connected ? 'white' : 'black'">favorite</v-icon>
       </v-toolbar>
       <v-content v-if="auth">
-        <v-container fluid style="min-height: 0;" grid-list-lg v-show="view=='socket'">
+        <v-container fluid grid-list-lg v-show="view=='socket'">
           <v-layout row wrap>
-            <v-flex v-for="socket in sockets" :key="socket.id" v-if="socket !== null" xs12 md4>
-              <v-card v-bind:class="socket.status == 1 ? 'cyan' : 'blue-grey'" color="darken-2" class="white--text">
-                <v-container fluid grid-list-lg fill-height>
-                  <v-layout row flex align-center justify-center>
-                    <v-flex xs10>
+            <v-flex v-for="socket in sockets" :key="socket.id" v-if="socket !== null" xs12 sm6 md4>
+              <v-card v-bind:class="socket.status == 1 ? 'cyan' : 'blue-grey'" color="darken-2" class="white--text" style="height: 100%;" @click.native="power(socket.id, !socket.status)">
+                <v-container>
+                  <v-layout row wrap>
+                    <v-flex>
                       <div>
                         <div class="headline">{{ socket.name }}</div>
                         <div>{{ socket.description }}</div>
                       </div>
-                    </v-flex>
-                    <v-flex xs2>
-                      <v-btn flat icon dark style="margin: 0; margin-bottom: 6px;" @click="power(socket.id, 1)">
-                        <v-icon>mdi-power-plug</v-icon>
-                      </v-btn>
-                      <v-btn flat icon dark style="margin: 0; margin-top: 6px;" @click="power(socket.id, 0)">
-                        <v-icon>mdi-power-plug-off</v-icon>
-                      </v-btn>
                     </v-flex>
                   </v-layout>
                 </v-container>
@@ -83,23 +75,16 @@
             </v-flex>
           </v-layout>
         </v-container>
-        <v-container fluid style="min-height: 0;" grid-list-lg v-show="view=='timer'">
+        <v-container fluid v-show="view=='timer'">
           <v-data-table :headers="headers" :items="timers" hide-actions class="elevation-1">
             <template slot="items" slot-scope="props">
-              <td>{{ socketWithID(props.item.socket_id).name }}</td>
-              <td class="text-xs-center">{{ props.item.action }}</td>
-              <td class="text-xs-center">{{ props.item.mode }}</td>
-              <td class="text-xs-center">{{ props.item.offset }}</td>
-              <td class="text-xs-center">{{ props.item.minute }}</td>
-              <td class="text-xs-center">{{ props.item.hour }}</td>
-              <td class="text-xs-center">{{ props.item.dom }}</td>
-              <td class="text-xs-center">{{ props.item.month }}</td>
-              <td class="text-xs-center">{{ props.item.dow }}</td>
-              <td class="justify-center">
-                <v-btn icon class="mx-0" @click="editTimer(props.item)">
-                  <v-icon color="cyan darken-2">edit</v-icon>
-                </v-btn>
-              </td>
+              <tr @click="editTimer(props.item)">
+                <td>{{ socketWithID(props.item.socket_id).name }}</td>
+                <td class="text-xs-center">{{ actions[props.item.action].text }}</td>
+                <td class="text-xs-center">{{ props.item.mode }}</td>
+                <td class="text-xs-center">{{ props.item.offset }}</td>
+                <td class="text-xs-center">{{ props.item.time }}</td>
+              </tr>
             </template>
           </v-data-table>
         </v-container>
@@ -123,19 +108,7 @@
                   </v-flex>
                   <template v-if="editedTimer.mode=='time'">
                     <v-flex xs12 sm6 md4>
-                      <v-text-field hint="minute (0-59)" persistent-hint v-model="editedTimer.minute"></v-text-field>
-                    </v-flex>
-                    <v-flex xs12 sm6 md4>
-                      <v-text-field hint="hour (0-23)" persistent-hint v-model="editedTimer.hour"></v-text-field>
-                    </v-flex>
-                    <v-flex xs12 sm6 md4>
-                      <v-text-field hint="day of month (1-31)" persistent-hint v-model="editedTimer.dom"></v-text-field>
-                    </v-flex>
-                    <v-flex xs12 sm6 md4>
-                      <v-text-field hint="month (1-12)" persistent-hint v-model="editedTimer.month"></v-text-field>
-                    </v-flex>
-                    <v-flex xs12 sm6 md4>
-                      <v-text-field hint="day of week (0-7)" persistent-hint v-model="editedTimer.dow"></v-text-field>
+                      <v-text-field hint="cron style timer" persistent-hint v-model="editedTimer.time"></v-text-field>
                     </v-flex>
                   </template>
                   <template v-else>

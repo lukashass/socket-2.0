@@ -17,7 +17,7 @@ var vm = new Vue({
     // backend
     sockets: [],
     headers: [{
-      text: 'Socket name',
+      text: 'Socket',
       align: 'left',
       sortable: false,
       value: 'name'
@@ -35,29 +35,8 @@ var vm = new Vue({
       value: 'offset'
     },
     {
-      text: 'Minute',
-      value: 'minute'
-    },
-    {
-      text: 'Hour',
-      value: 'hour'
-    },
-    {
-      text: 'Day of Month',
-      value: 'dom'
-    },
-    {
-      text: 'Month',
-      value: 'month'
-    },
-    {
-      text: 'Day of Week',
-      value: 'dow'
-    },
-    {
-      text: 'Actions',
-      value: 'name',
-      sortable: false
+      text: 'Time',
+      value: 'time'
     }
     ],
     timers: [],
@@ -69,22 +48,14 @@ var vm = new Vue({
       action: 0,
       mode: 'time',
       offset: 0,
-      minute: '*',
-      hour: '*',
-      dom: '*',
-      month: '*',
-      dow: '*'
+      time: '* * * * *'
     },
     defaultTimer: {
       socket_id: 0,
       action: 0,
       mode: 'time',
       offset: 0,
-      minute: '*',
-      hour: '*',
-      dom: '*',
-      month: '*',
-      dow: '*'
+      time: '* * * * *'
     },
     modes: [{
       text: 'Time',
@@ -112,12 +83,12 @@ var vm = new Vue({
     }
     ],
     actions: [{
-      text: 'On',
-      value: 1
-    },
-    {
       text: 'Off',
       value: 0
+    },
+    {
+      text: 'On',
+      value: 1
     }
     ]
 

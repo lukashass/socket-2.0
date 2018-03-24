@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Mar 06, 2018 at 10:47 AM
+-- Generation Time: Mar 24, 2018 at 10:10 PM
 -- Server version: 5.7.21-0ubuntu0.16.04.1
--- PHP Version: 7.0.25-0ubuntu0.16.04.1
+-- PHP Version: 7.0.28-0ubuntu0.16.04.1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
@@ -31,7 +31,7 @@ SET time_zone = "+00:00";
 CREATE TABLE `sockets` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
-  `desciption` varchar(255) NOT NULL,
+  `description` varchar(255) NOT NULL,
   `system_name` varchar(255) NOT NULL,
   `code_on` int(11) NOT NULL,
   `code_off` int(11) NOT NULL,
@@ -51,11 +51,7 @@ CREATE TABLE `timers` (
   `action` int(11) NOT NULL,
   `mode` varchar(255) NOT NULL,
   `offset` int(11) NOT NULL DEFAULT '0',
-  `minute` varchar(255) NOT NULL DEFAULT '*',
-  `hour` varchar(255) NOT NULL DEFAULT '*',
-  `dom` varchar(255) NOT NULL DEFAULT '*',
-  `month` varchar(255) NOT NULL DEFAULT '*',
-  `dow` varchar(255) NOT NULL DEFAULT '*'
+  `time` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -87,7 +83,7 @@ ALTER TABLE `sockets`
 -- AUTO_INCREMENT for table `timers`
 --
 ALTER TABLE `timers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;COMMIT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

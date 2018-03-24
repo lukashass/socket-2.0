@@ -106,14 +106,13 @@ function incoming (ws, message) {
         broadcastOthers(ws, raw)
         break
       case 'timers':
-        console.log(data.timers)
         updateTimers(data.timers)
         updateJobs()
         var raw = {
           'type': 'timers',
           'timers': timers
         }
-        broadcastOthers(ws, raw)
+        broadcastAll(raw)
         break
       case 'logout':
         authConnection(ws, false)
@@ -177,13 +176,10 @@ function broadcastOthers (ws, raw) {
   })
 }
 
-function broadcastAll () {
+function broadcastAll (raw) {
   wss.clients.forEach(function (client) {
     if (client.readyState === WebSocket.OPEN) {
-      sendConnection(client, {
-        'type': 'sockets',
-        'sockets': sockets
-      })
+      sendConnection(client, raw)
     }
   })
 }
@@ -203,7 +199,12 @@ function updateJobs () {
         objectWithID(data, timer.socket_id).status = timer.action
 
         updateSockets(data)
-        broadcastAll()
+
+        var raw = {
+          'type': 'sockets',
+          'sockets': sockets
+        }
+        broadcastAll(raw)
       }
     })
   })
@@ -218,12 +219,12 @@ function clearJobs () {
 
 function jobTime (timer, sunTimes) {
   if (timer.mode === 'time') {
-    var result = timer.minute + ' ' + timer.hour + ' ' + timer.dom + ' ' + timer.month + ' ' + timer.dow
+    var result = timer.time
   } else {
     var offsetDate = addMinutes(sunTimes[timer.mode], timer.offset)
     var result = offsetDate.getMinutes() + ' ' + offsetDate.getHours() + ' * * *'
+    timer.time = offsetDate.getHours() + ':' + offsetDate.getMinutes()
   }
-
   return result
 }
 
@@ -231,11 +232,11 @@ function updateTimers (data) {
   data.forEach(function (timer, i) {
     if (timer !== timers[i]) {
       if (i >= timers.length) {
-        db.query('INSERT INTO timers (socket_id, action, mode, offset, minute, hour, dom, month, dow) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [timer.socket_id, timer.action, timer.mode, timer.offset, timer.minute, timer.hour, timer.dom, timer.month, timer.dow], function (error, results, fields) {
+        db.query('INSERT INTO timers (socket_id, action, mode, offset, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [timer.socket_id, timer.action, timer.mode, timer.offset, timer.time], function (error, results, fields) {
           if (error) throw error
         })
       } else {
-        db.query('UPDATE timers SET socket_id = ?, action = ?, mode = ?, offset = ?, minute = ?, hour = ?, dom = ?, month = ?, dow = ? WHERE id = ?', [timer.socket_id, timer.action, timer.mode, timer.offset, timer.minute, timer.hour, timer.dom, timer.month, timer.dow, timer.id], function (error, results, fields) {
+        db.query('UPDATE timers SET socket_id = ?, action = ?, mode = ?, offset = ?, time = ? WHERE id = ?', [timer.socket_id, timer.action, timer.mode, timer.offset, timer.time, timer.id], function (error, results, fields) {
           if (error) throw error
         })
       }
