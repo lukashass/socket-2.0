@@ -131,6 +131,13 @@ function incoming(ws, message) {
 
   if (ws.auth) {
     switch (data.type) {
+      case 'toggle':
+        toggleSocket(data.toggle.id, data.toggle.action)
+        broadcastOthers(ws, {
+          'type': 'sockets',
+          'sockets': sockets
+        })
+        break
       case 'sockets':
         updateSockets(data.sockets)
         broadcastOthers(ws, {
@@ -191,13 +198,6 @@ function updateSockets(data) {
         db.query('UPDATE sockets SET status = ? WHERE id = ?', [item.status, item.id], function (error, results, fields) {
           if (error) throw error
         })
-
-        if (sockets[i].status !== old[i].status) {
-          mqtt_client.publish(CONFIG.mqtt.path + 'tx/', JSON.stringify({
-            'code': (item.status === 1 ? parseInt(item.code_on, 10) : parseInt(item.code_off, 10)),
-            'protocol': parseInt(item.protocol, 10)
-          }))
-        }
       }
     })
   }
