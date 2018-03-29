@@ -1,22 +1,29 @@
 {
-    "wsPort": "1234",
+  "wsPort": "1234",
 
-    "db" : {
-        "host": "localhost",
-        "user": "user",
-        "password": "password",
-        "name": "database"
-    },
+  "db": {
+    "host": "localhost",
+    "user": "user",
+    "password": "password",
+    "name": "database"
+  },
 
-    "auth": {
-        "password": "0000",
-        "cookie": "monster"
-    },
+  "auth": {
+    "password": "0000",
+    "cookie": "monster"
+  },
 
-    "loc": {
-        "lat": 51.0,
-        "lng": 0.0
-    },
+  "mqtt": {
+    "host": "iot.eclipse.org",
+    "user": "username",
+    "password": "password",
+    "path": "path/in/mqtt/"
+  },
 
-    "jobRefresh": "0 1 * * *"
+  "loc": {
+    "lat": 51.0,
+    "lng": 0.0
+  },
+
+  "jobRefresh": "0 1 * * *"
 }

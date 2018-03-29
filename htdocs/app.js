@@ -99,18 +99,11 @@ var vm = new Vue({
       ws.send(JSON.stringify(raw))
     },
     power: function (id, action) {
-      this.socketWithID(id).status = action
-      /*this.sockets.forEach(function (socket) {
-        if (socket.id === id) {
-          socket.status = action
-        }
-      })*/
-      // this.sockets[id].status = action
-      var raw = {
-        'type': 'sockets',
-        'sockets': this.sockets
-      }
-      this.send(raw)
+      this.send({
+        'type': 'toggle',
+        'id': id,
+        'action': action
+      })
     },
     setView: function (view) {
       this.view = view
