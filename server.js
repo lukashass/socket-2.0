@@ -132,7 +132,7 @@ function incoming(ws, message) {
   if (ws.auth) {
     switch (data.type) {
       case 'toggle':
-        toggleSocket(data.toggle.id, data.toggle.action)
+        toggleSocket(data.id, data.action)
         broadcastOthers(ws, {
           'type': 'sockets',
           'sockets': sockets

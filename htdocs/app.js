@@ -99,6 +99,7 @@ var vm = new Vue({
       ws.send(JSON.stringify(raw))
     },
     power: function (id, action) {
+      this.socketWithID(id).status = action
       this.send({
         'type': 'toggle',
         'id': id,
