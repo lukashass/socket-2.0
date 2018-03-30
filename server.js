@@ -11,18 +11,24 @@ const mysqlCon = {
   database: CONFIG.db.name
 }
 
-var db = connectMysql(mysqlCon)
+var sockets = []
+var timers
+var jobs = []
 
-var mqtt_client = mqtt.connect(CONFIG.mqtt.host, {
+// ////////////////
+// mqtt
+// ////////////////
+
+var mqttClient = mqtt.connect(CONFIG.mqtt.host, {
   username: CONFIG.mqtt.user,
   password: CONFIG.mqtt.password
 })
 
-mqtt_client.on('connect', function () {
-  mqtt_client.subscribe(CONFIG.mqtt.path + 'rx/')
+mqttClient.on('connect', function () {
+  mqttClient.subscribe(CONFIG.mqtt.path + 'rx/')
 })
 
-mqtt_client.on('message', function (topic, message) {
+mqttClient.on('message', function (topic, message) {
   // message is Buffer
   var received = JSON.parse(message)
   sockets.some(function (item) {
@@ -46,17 +52,28 @@ mqtt_client.on('message', function (topic, message) {
   })
 })
 
-const wss = new WebSocket.Server({
-  port: CONFIG.wsPort
-})
+// ////////////////
+// mysql
+// ////////////////
 
-var sockets = []
-var timers
-var jobs = []
+var db = connectMysql(mysqlCon)
+
+function connectMysql (connection) {
+  var result = mysql.createConnection(connection)
+
+  result.on('error', function (err) {
+    if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+      db = connectMysql(connection)
+    }
+    console.log(err.code) // 'ER_BAD_DB_ERROR'
+  })
+
+  return result
+}
 
 db.query('SELECT * FROM sockets', function (error, results, fields) {
   if (error) throw error
-  results.forEach(function (result) {
+  results.forEach((result) => {
     result.code_on = JSON.parse(result.code_on)
     result.code_off = JSON.parse(result.code_off)
   })
@@ -71,7 +88,15 @@ db.query('SELECT * FROM timers', function (error, results, fields) {
   updateJobs()
 })
 
-wss.on('connection', function connection(ws) {
+// ////////////////
+// websocket
+// ////////////////
+
+const wss = new WebSocket.Server({
+  port: CONFIG.wsPort
+})
+
+wss.on('connection', function connection (ws) {
   ws.on('error', () => console.log('errored'))
 
   initConnection(ws)
@@ -87,7 +112,7 @@ wss.on('connection', function connection(ws) {
 
 // WebSocket keep alive pings
 setInterval(() => {
-  wss.clients.forEach(function each(ws) {
+  wss.clients.forEach((ws) => {
     if (ws.isAlive === false) return ws.terminate()
 
     ws.isAlive = false
@@ -95,30 +120,25 @@ setInterval(() => {
   })
 }, 30000)
 
-// refresh Jobs regularly because sunTimes change
-schedule.scheduleJob(CONFIG.jobRefresh, function () {
-  updateJobs()
-})
-
-function connectMysql(connection) {
-  var result = mysql.createConnection(connection)
-
-  result.on('error', function (err) {
-    if (err.code === 'PROTOCOL_CONNECTION_LOST') {
-      db = connectMysql(connection)
-    }
-    console.log(err.code) // 'ER_BAD_DB_ERROR'
-  })
-
-  return result
-}
-
-function initConnection(ws) {
+function initConnection (ws) {
   ws.isAlive = true
   ws.auth = false
 }
 
-function incoming(ws, message) {
+function initialData (ws) {
+  // initial data for client
+  sendConnection(ws, {
+    'type': 'sockets',
+    'sockets': sockets
+  })
+
+  sendConnection(ws, {
+    'type': 'timers',
+    'timers': timers
+  })
+}
+
+function incoming (ws, message) {
   // temp var to find changes
   var data
 
@@ -170,13 +190,13 @@ function incoming(ws, message) {
   console.log('received: ' + data.type)
 }
 
-function sendConnection(ws, data) {
+function sendConnection (ws, data) {
   if (ws.readyState === ws.OPEN) {
     ws.send(JSON.stringify(data))
   }
 }
 
-function authConnection(ws, state) {
+function authConnection (ws, state) {
   ws.auth = state
   if (ws.auth) {
     sendConnection(ws, {
@@ -187,11 +207,31 @@ function authConnection(ws, state) {
   }
 }
 
-function updateSockets(data) {
+function broadcastOthers (ws, raw) {
+  wss.clients.forEach((client) => {
+    if (client !== ws && client.readyState === WebSocket.OPEN) {
+      sendConnection(client, raw)
+    }
+  })
+}
+
+function broadcastAll (raw) {
+  wss.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) {
+      sendConnection(client, raw)
+    }
+  })
+}
+
+// ////////////////
+// sockets
+// ////////////////
+
+function updateSockets (data) {
   var old = sockets
   sockets = data
   if (sockets.length === old.length) { // test not really good enough
-    sockets.forEach(function (item, i) {
+    sockets.forEach((item, i) => {
       // sockets[i] === item
       // if(sockets[i] != old[i]) {
       if (item.status !== old[i].status) { // okay for now, only changing status anyway
@@ -203,7 +243,7 @@ function updateSockets(data) {
   }
 }
 
-function toggleSocket(id, action) {
+function toggleSocket (id, action) {
   var socket = objectWithID(sockets, id)
   if (socket.status === action) {
     return false
@@ -216,7 +256,7 @@ function toggleSocket(id, action) {
   })
 
   // TODO: will also be executed when called by external remote
-  mqtt_client.publish(CONFIG.mqtt.path + 'tx/', JSON.stringify({
+  mqttClient.publish(CONFIG.mqtt.path + 'tx/', JSON.stringify({
     'code': (socket.status === 1 ? socket.code_on[0] : socket.code_off[0]),
     'protocol': socket.protocol
   }))
@@ -224,26 +264,25 @@ function toggleSocket(id, action) {
   return true
 }
 
-function broadcastOthers(ws, raw) {
-  wss.clients.forEach(function (client) {
-    if (client !== ws && client.readyState === WebSocket.OPEN) {
-      sendConnection(client, raw)
+function objectWithID (array, id) {
+  var res
+  array.some(function (item) {
+    if (item.id === id) {
+      res = item
+      return true
     }
   })
+  return res
 }
 
-function broadcastAll(raw) {
-  wss.clients.forEach(function (client) {
-    if (client.readyState === WebSocket.OPEN) {
-      sendConnection(client, raw)
-    }
-  })
-}
+// ////////////////
+// jobs
+// ////////////////
 
-function updateJobs() {
+function updateJobs () {
   clearJobs()
   var sunTimes
-  timers.forEach(function (timer, i) {
+  timers.forEach((timer, i) => {
     // set sunTimes once
     if (timer.mode !== 'time' && sunTimes == null) {
       sunTimes = SunCalc.getTimes(new Date(), CONFIG.loc.lat, CONFIG.loc.lng)
@@ -260,26 +299,38 @@ function updateJobs() {
   })
 }
 
-function clearJobs() {
-  jobs.forEach(function (job) {
+function clearJobs () {
+  jobs.forEach((job) => {
     job.cancel()
   })
   jobs = []
 }
 
-function jobTime(timer, sunTimes) {
+function jobTime (timer, sunTimes) {
   if (timer.mode === 'time') {
-    var result = timer.time
+    return timer.time
   } else {
     var offsetDate = addMinutes(sunTimes[timer.mode], timer.offset)
-    var result = offsetDate.getMinutes() + ' ' + offsetDate.getHours() + ' * * *'
     timer.time = offsetDate.getHours() + ':' + offsetDate.getMinutes()
+    return offsetDate.getMinutes() + ' ' + offsetDate.getHours() + ' * * *'
   }
-  return result
 }
 
-function updateTimers(data) {
-  data.forEach(function (timer, i) {
+function addMinutes (date, minutes) {
+  return new Date(date.getTime() + minutes * 60000)
+}
+
+// refresh Jobs regularly because sunTimes change
+schedule.scheduleJob(CONFIG.jobRefresh, function () {
+  updateJobs()
+})
+
+// ////////////////
+// timers
+// ////////////////
+
+function updateTimers (data) {
+  data.forEach((timer, i) => {
     if (timer !== timers[i]) {
       if (i >= timers.length) {
         db.query('INSERT INTO timers (socket_id, action, mode, offset, time) VALUES (?, ?, ?, ?, ?)', [timer.socket_id, timer.action, timer.mode, timer.offset, timer.time], function (error, results, fields) {
@@ -293,32 +344,4 @@ function updateTimers(data) {
     }
   })
   timers = data
-}
-
-function initialData(ws) {
-  // initial data for client
-  sendConnection(ws, {
-    'type': 'sockets',
-    'sockets': sockets
-  })
-
-  sendConnection(ws, {
-    'type': 'timers',
-    'timers': timers
-  })
-}
-
-function addMinutes(date, minutes) {
-  return new Date(date.getTime() + minutes * 60000)
-}
-
-function objectWithID(array, id) {
-  var res
-  array.some(function (item) {
-    if (item.id === id) {
-      res = item
-      return true
-    }
-  })
-  return res
 }

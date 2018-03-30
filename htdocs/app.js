@@ -1,3 +1,5 @@
+/* global Vue, WebSocket */
+
 Vue.config.devtools = true
 
 var vm = new Vue({
@@ -16,28 +18,29 @@ var vm = new Vue({
 
     // backend
     sockets: [],
-    headers: [{
-      text: 'Socket',
-      align: 'left',
-      sortable: false,
-      value: 'name'
-    },
-    {
-      text: 'Action',
-      value: 'action'
-    },
-    {
-      text: 'Mode',
-      value: 'mode'
-    },
-    {
-      text: 'Offset',
-      value: 'offset'
-    },
-    {
-      text: 'Time',
-      value: 'time'
-    }
+    headers: [
+      {
+        text: 'Socket',
+        align: 'left',
+        sortable: false,
+        value: 'name'
+      },
+      {
+        text: 'Action',
+        value: 'action'
+      },
+      {
+        text: 'Mode',
+        value: 'mode'
+      },
+      {
+        text: 'Offset',
+        value: 'offset'
+      },
+      {
+        text: 'Time',
+        value: 'time'
+      }
     ],
     timers: [],
 
@@ -57,39 +60,41 @@ var vm = new Vue({
       offset: 0,
       time: '* * * * *'
     },
-    modes: [{
-      text: 'Time',
-      value: 'time'
-    },
-    {
-      text: 'Dawn',
-      value: 'dawn'
-    },
-    {
-      text: 'Sunrise',
-      value: 'sunrise'
-    },
-    {
-      text: 'Noon',
-      value: 'solarNoon'
-    },
-    {
-      text: 'Sunset',
-      value: 'sunset'
-    },
-    {
-      text: 'Dusk',
-      value: 'dusk'
-    }
+    modes: [
+      {
+        text: 'Time',
+        value: 'time'
+      },
+      {
+        text: 'Dawn',
+        value: 'dawn'
+      },
+      {
+        text: 'Sunrise',
+        value: 'sunrise'
+      },
+      {
+        text: 'Noon',
+        value: 'solarNoon'
+      },
+      {
+        text: 'Sunset',
+        value: 'sunset'
+      },
+      {
+        text: 'Dusk',
+        value: 'dusk'
+      }
     ],
-    actions: [{
-      text: 'Off',
-      value: 0
-    },
-    {
-      text: 'On',
-      value: 1
-    }
+    actions: [
+      {
+        text: 'Off',
+        value: 0
+      },
+      {
+        text: 'On',
+        value: 1
+      }
     ]
 
   },
@@ -115,12 +120,6 @@ var vm = new Vue({
       this.editedTimer = Object.assign({}, item)
       this.dialog = true
     },
-
-    deleteItem (item) {
-      const index = this.timers.indexOf(item)
-      confirm('Are you sure you want to delete this item?') && this.timers.splice(index, 1)
-    },
-
     close () {
       this.dialog = false
       setTimeout(() => {
@@ -185,13 +184,7 @@ var vm = new Vue({
 })
 
 // Create WebSocket connection.
-if (window.location.protocol === 'https:') {
-  var protocol = 'wss:'
-} else {
-  var protocol = 'ws:'
-}
-
-var ws = connectWebsocket(protocol + '//' + window.location.hostname + '/websocket/')
+var ws = connectWebsocket(getProtocol() + '//' + window.location.hostname + '/websocket/')
 
 function connectWebsocket (url) {
   var result = new WebSocket(url)
@@ -227,7 +220,7 @@ function incoming (input) {
   try {
     data = JSON.parse(input)
   } catch (e) {
-    alert(e)
+    console.log(e)
   }
   switch (data.type) {
     case 'sockets':
@@ -266,4 +259,12 @@ function getCookie (cname) {
     }
   }
   return ''
+}
+
+function getProtocol () {
+  if (window.location.protocol === 'https:') {
+    return 'wss:'
+  } else {
+    return 'ws:'
+  }
 }
