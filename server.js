@@ -258,7 +258,8 @@ function toggleSocket (id, action) {
   // TODO: will also be executed when called by external remote
   mqttClient.publish(CONFIG.mqtt.path + 'tx/', JSON.stringify({
     'code': (socket.status === 1 ? socket.code_on[0] : socket.code_off[0]),
-    'protocol': socket.protocol
+    'protocol': socket.protocol,
+    'pulseLength': socket.pulseLength
   }))
 
   return true

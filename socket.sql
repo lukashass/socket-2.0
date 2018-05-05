@@ -3,8 +3,8 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Mar 29, 2018 at 02:47 PM
--- Server version: 5.7.21-0ubuntu0.16.04.1
+-- Generation Time: May 05, 2018 at 10:40 PM
+-- Server version: 5.7.22-0ubuntu0.16.04.1
 -- PHP Version: 7.0.28-0ubuntu0.16.04.1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -33,9 +33,10 @@ CREATE TABLE `sockets` (
   `name` varchar(255) NOT NULL,
   `description` varchar(255) NOT NULL,
   `system_name` varchar(255) NOT NULL,
-  `code_on` json NOT NULL,
-  `code_off` json NOT NULL,
+  `code_on` varchar(255) NOT NULL,
+  `code_off` varchar(255) NOT NULL,
   `protocol` int(11) NOT NULL,
+  `pulseLength` int(11) NOT NULL,
   `status` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
